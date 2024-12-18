@@ -22,16 +22,76 @@
    - Put directly in /components/shared/[Component].tsx
    - Add "use client" directive if needed
 
-## 3. Page Organization
+## 3. Library Modernization
+1. Replace deprecated React libraries:
+   - Use @radix-ui for accessible UI components
+   - Use react-aria for complex interactions
+   - Use next/image instead of react-image libraries
+   - Use next-video or video.js for video players
+   - Use framer-motion for modern animations
+   - Use @tanstack/react-query for server state
+   - Use Zustand or Jotai for client state
+   - Use react-hook-form for form handling
+   - Use zod for schema validation
+
+2. Import Patterns:
+   - Use path aliases with @/ prefix:
+     ```typescript
+     import { Component } from '@/components/shared/Component';
+     import { getData } from '@/components/server/getData';
+     import { useAuth } from '@/context/AuthContext';
+     import { db } from '@/lib/firebase/config';
+     ```
+
+## 4. Responsive Design
+1. Mobile-First Approach:
+   - Start with mobile layout
+   - Add breakpoints for larger screens
+   - Use Tailwind's responsive prefixes
+
+2. Portrait Mode (Mobile Vertical):
+   ```typescript
+   <div className="flex flex-col p-4 space-y-4 md:space-y-0">
+     <header className="h-16" />
+     <main className="flex-grow" />
+     <footer className="h-12" />
+   </div>
+   ```
+
+3. Landscape Mode (Mobile Horizontal):
+   ```typescript
+   <div className="flex flex-col landscape:flex-row p-4">
+     <aside className="w-full landscape:w-1/4" />
+     <main className="flex-grow" />
+   </div>
+   ```
+
+4. Desktop Adaptations:
+   ```typescript
+   <div className="
+     grid
+     grid-cols-1
+     md:grid-cols-2
+     lg:grid-cols-3
+     gap-4
+     p-4
+     md:p-6
+     lg:p-8
+   ">
+     {/* Content */}
+   </div>
+   ```
+
+## 5. Page Organization
 1. Basic Page Structure:
    - Put all pages in the /app directory
-   - Use folder names for routes (e.g., /app/about/page.tsx for /about route)
+   - Use folder names for routes
    - Keep page components clean and focused
 
 2. Splitting Large Pages:
    - Move complex UI sections to /components/shared
    - Move data fetching to /components/server
-   - Keep page files as orchestrators that import and compose components
+   - Keep page files as orchestrators
 
 3. Page Component Pattern:
    ```typescript
@@ -45,12 +105,7 @@
    }
    ```
 
-4. Page-Specific Components:
-   - Create page-specific components in /components/shared/[PageName]/
-   - Keep data fetching in /components/server/[PageName]/
-   - Import and compose in the page file
-
-## 4. TypeScript Conversion
+## 6. TypeScript Conversion
 1. Add interfaces/types for:
    - Component props
    - State objects
@@ -62,7 +117,7 @@
    - Null checks
    - API response parsing
 
-## 5. Next.js Adaptations
+## 7. Next.js Adaptations
 1. Replace React Router with Next.js components:
    - Use 'next/link' instead of React Router's Link
    - Use 'next/navigation' hooks
@@ -77,14 +132,20 @@
    - Use async/await syntax
    - Implement proper error handling
 
-## 6. Component Implementation Pattern
-
-1. Server Data Component (/components/server/[Component]Data.tsx):
+## 8. Component Implementation Pattern
+1. Server Data Component:
    ```typescript
+   // @/components/server/[Component]Data.tsx
    import { cache } from 'react';
+   import { db } from '@/lib/firebase/config';
    
-   export interface DataType {...}
-   export const getData = cache(async () => {...})
+   export interface DataType {
+     // Type definitions
+   }
+   
+   export const getData = cache(async () => {
+     // Data fetching logic
+   });
    
    export default async function ComponentData() {
      const result = await getData();
@@ -92,35 +153,42 @@
    }
    ```
 
-2. Client UI Component (/components/shared/[Component].tsx):
+2. Client UI Component:
    ```typescript
+   // @/components/shared/[Component].tsx
    "use client";
    
-   interface Props {...}
-   export default function Component({ data }: Props) {
-     // UI logic, state, effects
-     return (...);
-   }
-   ```
-
-3. Server Wrapper (/components/shared/[Component]Wrapper.tsx):
-   ```typescript
-   import { getData } from '../server/[Component]Data';
-   import Component from './Component';
+   import { useTheme } from '@/context/ThemeContext';
    
-   export default async function ComponentWrapper() {
-     const data = await getData();
-     return <Component data={data} />;
+   interface Props {
+     // Props definitions
+   }
+   
+   export default function Component({ data }: Props) {
+     // UI logic
+     return (
+       <div className="
+         flex flex-col
+         md:flex-row
+         p-4
+         md:p-6
+         space-y-4
+         md:space-y-0
+         md:space-x-4
+       ">
+         {/* Responsive content */}
+       </div>
+     );
    }
    ```
 
-## 7. Error Handling and Type Safety
+## 9. Error Handling and Type Safety
 1. Add proper error boundaries
 2. Implement loading states
 3. Add type guards for data validation
 4. Handle edge cases and null values
 
-## 8. Best Practices
+## 10. Best Practices
 1. Keep data fetching in server components
 2. Keep interactivity in client components
 3. Use TypeScript for better type safety
@@ -130,7 +198,7 @@
 7. Split components logically
 8. Keep the same UI/UX while improving performance
 
-## 9. Common Patterns
+## 11. Common Patterns
 1. Data Fetching:
    - Use server components for Firebase/API calls
    - Cache results when possible
@@ -151,7 +219,7 @@
    - Use Next.js Image component
    - Configure next.config.ts for external images
 
-## 10. Page-Specific Guidelines
+## 12. Page-Specific Guidelines
 1. Large Page Splitting Strategy:
    ```
    /app/[route]/
