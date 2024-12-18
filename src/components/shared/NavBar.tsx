@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaSun, FaMoon, FaChevronDown, FaChevronUp, FaBars, FaTimes } from "react-icons/fa";
@@ -17,6 +17,7 @@ interface NavState {
 
 type NavAction = 
   | { type: "TOGGLE_MENU"; payload: string }
+  | { type: "CLOSE_MENU" }
   | { type: "TOGGLE_MOBILE_MENU" }
   | { type: "CLOSE_ALL" };
 
@@ -31,6 +32,11 @@ function reducer(state: NavState, action: NavAction): NavState {
       return {
         ...state,
         openMenu: state.openMenu === action.payload ? null : action.payload,
+      };
+    case "CLOSE_MENU":
+      return {
+        ...state,
+        openMenu: null,
       };
     case "TOGGLE_MOBILE_MENU":
       return {
@@ -65,24 +71,43 @@ const SubMenu = ({
   closeMenu,
   isMobile,
 }: SubMenuProps) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        closeMenu();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, closeMenu]);
+
   return (
-    <div className={`${isMobile ? "w-full" : "relative group"}`}>
+    <div ref={menuRef} className={`${isMobile ? "w-full" : "relative group"}`}>
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleMenu();
-        }}
+        onClick={toggleMenu}
         className="flex items-center justify-between w-full text-white hover:text-gray-200 py-2"
       >
-        <span>{title}</span>
-        <span className="ml-1">{isOpen ? <FaChevronUp /> : <FaChevronDown />}</span>
+        <span className="flex-grow text-left">{title}</span>
+        <span className="ml-1">
+          {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+        </span>
       </button>
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
             className={`${
               isMobile
                 ? "w-full bg-teal-800"
@@ -100,9 +125,7 @@ const SubMenu = ({
                 } whitespace-nowrap`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!isMobile) {
-                    closeMenu();
-                  }
+                  closeMenu();
                 }}
               >
                 {item.name}
@@ -121,6 +144,7 @@ export default function NavBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch({ type: "CLOSE_ALL" });
@@ -128,9 +152,10 @@ export default function NavBar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+      const target = event.target as Element;
       if (
-        !target.closest(".mobile-menu-container") &&
+        navRef.current &&
+        !navRef.current.contains(target) &&
         !target.closest(".hamburger-button")
       ) {
         dispatch({ type: "CLOSE_ALL" });
@@ -157,7 +182,7 @@ export default function NavBar() {
   };
 
   const closeMenu = () => {
-    dispatch({ type: "CLOSE_ALL" });
+    dispatch({ type: "CLOSE_MENU" });
   };
 
   const aboutUsItems = [
@@ -178,7 +203,10 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className={`${theme === "dark" ? "bg-gray-900" : "bg-teal-700"} w-full sticky top-0 z-50`}>
+    <nav 
+      ref={navRef}
+      className={`${theme === "dark" ? "bg-gray-900" : "bg-teal-700"} w-full sticky top-0 z-50`}
+    >
       {/* Desktop Navigation */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4">
@@ -330,14 +358,14 @@ export default function NavBar() {
                 <Link
                   href="/"
                   className="text-white hover:text-gray-200 py-2"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={() => dispatch({ type: "CLOSE_ALL" })}
                 >
                   Home
                 </Link>
                 <Link
                   href="/search-page"
                   className="text-white hover:text-gray-200 py-2"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={() => dispatch({ type: "CLOSE_ALL" })}
                 >
                   Search
                 </Link>
@@ -352,7 +380,7 @@ export default function NavBar() {
                 <Link
                   href="/impact-stories"
                   className="text-white hover:text-gray-200 py-2"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={() => dispatch({ type: "CLOSE_ALL" })}
                 >
                   Stories
                 </Link>
@@ -383,7 +411,7 @@ export default function NavBar() {
                 <Link
                   href="/contact"
                   className="text-white hover:text-gray-200 py-2"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={() => dispatch({ type: "CLOSE_ALL" })}
                 >
                   Contact Us
                 </Link>
@@ -392,14 +420,14 @@ export default function NavBar() {
                     <Link
                       href="/create"
                       className="text-white hover:text-gray-200 py-2"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={() => dispatch({ type: "CLOSE_ALL" })}
                     >
                       Create
                     </Link>
                     <Link
                       href="/edit"
                       className="text-white hover:text-gray-200 py-2"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={() => dispatch({ type: "CLOSE_ALL" })}
                     >
                       Edit
                     </Link>
@@ -429,7 +457,7 @@ export default function NavBar() {
                     <Link
                       href="/login"
                       className="text-white hover:text-gray-200"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={() => dispatch({ type: "CLOSE_ALL" })}
                     >
                       Login
                     </Link>
