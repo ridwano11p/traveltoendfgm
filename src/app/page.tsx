@@ -1,92 +1,73 @@
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
-import HomeContent from '@/components/shared/HomeContent';
-import { getBannerContent } from '@/components/server/BannerData';
+import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase/config";
+import HomeClient from "@/components/shared/HomeClient";
 
-// Helper function to serialize Firestore data
-function serializeData(doc: any) {
-  const data = doc.data();
-  return {
-    id: doc.id,
-    ...Object.entries(data).reduce((acc: any, [key, value]) => {
-      // Convert Timestamp to ISO string
-      if (value && typeof value === 'object' && 'toDate' in value) {
-        acc[key] = value.toDate().toISOString();
-      } 
-      // Handle arrays (like tags)
-      else if (Array.isArray(value)) {
-        acc[key] = [...value];
-      }
-      // Handle regular objects
-      else if (value && typeof value === 'object') {
-        acc[key] = { ...value };
-      }
-      // Handle primitive values
-      else {
-        acc[key] = value;
-      }
-      return acc;
-    }, {}),
-  };
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  isYouTubeVideo?: boolean;
+  tags: string[];
+  createdAt: string;
 }
 
-async function getHomePageData() {
+export interface FeatureStory {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  isYouTubeVideo?: boolean;
+  tags: string[];
+  createdAt: string;
+}
+
+async function getData() {
   try {
     // Fetch latest blogs
-    const blogsQuery = query(collection(db, 'blogs'), orderBy('createdAt', 'desc'), limit(5));
+    const blogsQuery = query(
+      collection(db, "blogs"),
+      orderBy("createdAt", "desc"),
+      limit(5)
+    );
     const blogsSnapshot = await getDocs(blogsQuery);
-    const blogs = blogsSnapshot.docs.map(doc => serializeData(doc));
+    const blogs = blogsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as BlogPost[];
 
     // Fetch feature story
-    const featureQuery = query(collection(db, 'featureStories'), orderBy('createdAt', 'desc'), limit(1));
+    const featureQuery = query(
+      collection(db, "featureStories"),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
     const featureSnapshot = await getDocs(featureQuery);
-    let featureStory = null;
+    let featureStory: FeatureStory | null = null;
+
     if (!featureSnapshot.empty) {
-      featureStory = serializeData(featureSnapshot.docs[0]);
+      const featureData = featureSnapshot.docs[0].data();
+      featureStory = {
+        id: featureSnapshot.docs[0].id,
+        ...featureData,
+        tags: featureData.tags || [],
+      } as FeatureStory;
     }
 
-    // Get banner content
-    const bannerResult = await getBannerContent();
-    const bannerContent = bannerResult.success ? 
-      (bannerResult.data ? serializeData({ id: 'banner', data: () => bannerResult.data }) : null) 
-      : null;
-
     return {
-      success: true,
-      data: {
-        latestBlogs: blogs,
-        featureStory,
-        bannerContent: bannerContent ? bannerContent : null
-      }
+      blogs,
+      featureStory,
     };
   } catch (error) {
-    console.error('Error fetching home page data:', error);
-    return {
-      success: false,
-      error: 'Failed to load home page data'
-    };
+    console.error("Error fetching data:", error);
+    throw new Error("Failed to fetch data");
   }
 }
 
-export default async function HomePage() {
-  const result = await getHomePageData();
+export default async function Home() {
+  const data = await getData();
 
-  if (!result.success) {
-    return <HomeContent 
-      latestBlogs={[]}
-      featureStory={null}
-      bannerContent={null}
-      error={result.error}
-    />;
-  }
-
-  const { latestBlogs, featureStory, bannerContent } = result.data;
-
-  return (
-    <HomeContent
-      latestBlogs={latestBlogs}
-      featureStory={featureStory}
-      bannerContent={bannerContent}
-    />
-  );
+  return <HomeClient initialData={data} />;
 }

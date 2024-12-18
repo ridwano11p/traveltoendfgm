@@ -1,40 +1,37 @@
 "use client";
 
-import Image from 'next/image';
-import VideoPlayer from './VideoPlayer';
+import Image from "next/image";
+import VideoPlayer from "./VideoPlayer";
 
 interface MediaContentProps {
   imageUrl?: string;
   videoUrl?: string;
-  mediaUrl?: string;
-  mediaType?: 'image' | 'video';
   isYouTubeVideo?: boolean;
-  title?: string;
+  title: string;
 }
 
-const MediaContent = ({ 
+export default function MediaContent({ 
   imageUrl, 
   videoUrl, 
-  mediaUrl, 
-  mediaType, 
   isYouTubeVideo = false, 
-  title = 'Media content'
-}: MediaContentProps) => {
-  const containerClasses = "w-full aspect-square md:aspect-video bg-black flex items-center justify-center overflow-hidden";
-  const mediaClasses = "w-full h-full object-contain";
-
-  // Handle combined media display (image and video)
+  title 
+}: MediaContentProps) {
+  const containerClasses = "w-full aspect-square md:aspect-video bg-black flex items-center justify-center overflow-hidden rounded-lg";
+  
   if (imageUrl && videoUrl) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className={containerClasses}>
-          <Image
-            src={imageUrl}
-            alt={title}
-            className={mediaClasses}
-            width={800}
-            height={600}
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority
+            />
+          </div>
         </div>
         <div className={containerClasses}>
           <VideoPlayer
@@ -45,36 +42,38 @@ const MediaContent = ({
       </div>
     );
   }
-
-  // Handle single video
-  if (videoUrl || (mediaType === 'video' && mediaUrl)) {
+  
+  if (videoUrl) {
     return (
       <div className={containerClasses}>
         <VideoPlayer
-          videoUrl={videoUrl || mediaUrl || ''}
+          videoUrl={videoUrl}
           isYouTubeVideo={isYouTubeVideo}
         />
       </div>
     );
   }
-
-  // Handle single image
-  if (imageUrl || (mediaType === 'image' && mediaUrl)) {
+  
+  if (imageUrl) {
     return (
       <div className={containerClasses}>
-        <Image
-          src={imageUrl || mediaUrl || ''}
-          alt={title}
-          className={mediaClasses}
-          width={800}
-          height={600}
-          priority
-        />
+        <div className="relative w-full h-full">
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
+          />
+        </div>
       </div>
     );
   }
-
-  return null;
-};
-
-export default MediaContent;
+  
+  return (
+    <div className={`${containerClasses} bg-gray-100 dark:bg-gray-800`}>
+      <p className="text-gray-500 dark:text-gray-400">No media available</p>
+    </div>
+  );
+}

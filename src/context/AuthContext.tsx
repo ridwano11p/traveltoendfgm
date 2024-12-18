@@ -1,101 +1,73 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
-import { useRouter } from 'next/navigation';
+import { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import { User, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
 
-type SerializedUser = {
-  uid: string;
-  email: string | null;
-  emailVerified: boolean;
-} | null;
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+}
 
-type AuthContextType = {
-  user: SerializedUser;
-  loading: boolean;
-  logout: () => void;
-  setUser: (user: SerializedUser) => void;
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  logout: () => {},
-  setUser: () => {},
-});
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<SerializedUser>(null);
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe: () => void;
-
-    try {
-      unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-        if (firebaseUser) {
-          // Serialize user data to prevent circular references
-          setUser({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            emailVerified: firebaseUser.emailVerified,
-          });
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      });
-    } catch (error) {
-      console.error('Error setting up auth state listener:', error);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
-    }
+    });
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
+    return () => unsubscribe();
   }, []);
 
-  const logout = () => {
+  const login = async (email: string, password: string) => {
     try {
-      signOut(auth)
-        .then(() => {
-          setUser(null);
-          // Clear any session cookies
-          document.cookie = 'auth-session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-          router.push('/');
-        })
-        .catch((error) => {
-          console.error('Failed to log out', error);
-        });
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential.user);
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Login error:", error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
     }
   };
 
   const value = {
     user,
-    loading,
+    login,
     logout,
-    setUser
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export default AuthContext;
+export { AuthContext };
