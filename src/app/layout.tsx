@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers/Providers";
@@ -6,12 +6,20 @@ import NavBar from "@/components/shared/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#90d2dc" },
+    { media: "(prefers-color-scheme: dark)", color: "#111827" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Travel To End FGM",
   description: "A platform dedicated to ending FGM through education and awareness",
   keywords: ["FGM", "education", "awareness", "travel", "impact", "stories"],
   authors: [{ name: "Travel To End FGM Team" }],
-  viewport: "width=device-width, initial-scale=1",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -22,10 +30,6 @@ export const metadata: Metadata = {
       { url: "/apple-touch-icon.png" },
     ],
   },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#90d2dc" },
-    { media: "(prefers-color-scheme: dark)", color: "#111827" },
-  ],
 };
 
 export default function RootLayout({
