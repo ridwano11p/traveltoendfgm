@@ -20,7 +20,7 @@ const publicPaths = [
   "/search-page",
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if the path is protected
@@ -37,19 +37,38 @@ export function middleware(request: NextRequest) {
   const authSession = request.cookies.get("auth-session");
 
   // If the path is protected and there's no session, redirect to login
-  if (isProtectedPath && !authSession) {
+  if (isProtectedPath && !authSession?.value) {
+    // Store the original URL to redirect back after login
     const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("redirect-url", pathname);
     return response;
   }
 
   // If user is authenticated and tries to access login page, redirect to home
-  if (authSession && pathname === "/login") {
-    const response = NextResponse.redirect(new URL("/", request.url));
+  // or to the stored redirect URL if it exists
+  if (authSession?.value && pathname === "/login") {
+    const redirectUrl = request.cookies.get("redirect-url");
+    const response = NextResponse.redirect(
+      new URL(redirectUrl?.value || "/", request.url)
+    );
+    // Clear the redirect URL cookie
+    response.cookies.delete("redirect-url");
     return response;
   }
 
-  // Allow the request to continue
-  return NextResponse.next();
+  // For all other cases, allow the request to continue
+  const response = NextResponse.next();
+  
+  // Add security headers
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  );
+
+  return response;
 }
 
 export const config = {

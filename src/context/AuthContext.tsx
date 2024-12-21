@@ -3,6 +3,7 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { User, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -27,10 +28,20 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        // Get the ID token
+        const idToken = await user.getIdToken();
+        // Set the auth session cookie
+        document.cookie = `auth-session=${idToken}; path=/; secure; samesite=strict`;
+      } else {
+        // Remove the auth session cookie
+        document.cookie = "auth-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      }
       setLoading(false);
     });
 
@@ -41,6 +52,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setUser(userCredential.user);
+      // Get the ID token and set the cookie
+      const idToken = await userCredential.user.getIdToken();
+      document.cookie = `auth-session=${idToken}; path=/; secure; samesite=strict`;
+      router.refresh(); // Refresh to update middleware state
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -51,6 +66,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await signOut(auth);
       setUser(null);
+      // Remove the auth session cookie
+      document.cookie = "auth-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      router.refresh(); // Refresh to update middleware state
     } catch (error) {
       console.error("Logout error:", error);
       throw error;
