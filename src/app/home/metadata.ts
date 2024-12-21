@@ -2,49 +2,35 @@ import { Metadata } from "next";
 import sitelogo from "@/assets/images/sitelogo.png";
 
 export const metadata: Metadata = {
-  title: "Travel to End FGM",
-  description: "Travel to End FGM is a platform dedicated to raising awareness and sharing stories to help end Female Genital Mutilation worldwide.",
-  applicationName: "Travel to End FGM",
-  authors: [{ name: "Travel to End FGM Team" }],
-  keywords: ["FGM", "Female Genital Mutilation", "Awareness", "Stories", "Impact", "Travel", "Education"],
-  creator: "Travel to End FGM Team",
-  publisher: "Travel to End FGM",
-  formatDetection: {
-    telephone: true,
-    date: true,
-    address: true,
-    email: true,
-  },
-  metadataBase: new URL("https://traveltoendfgm.vercel.app"),
-  alternates: {
-    canonical: "/",
-  },
+  // Override title for home page (no template)
+  title: "Travel to End FGM - Join the Movement to End Female Genital Mutilation",
+  
+  // Specific description for home page
+  description: "Join the movement to end Female Genital Mutilation. Learn about our mission, read impact stories, and take action with Travel to End FGM.",
+  
+  // Specific OpenGraph for home page sharing
   openGraph: {
-    title: "Travel to End FGM",
-    description: "Join the movement to end Female Genital Mutilation. Learn, share, and take action with Travel to End FGM.",
-    url: "https://traveltoendfgm.vercel.app",
-    siteName: "Travel to End FGM",
-    type: "website",
-    locale: "en_US",
+    title: "Travel to End FGM - Make an Impact",
+    description: "Join our mission to end Female Genital Mutilation through education, awareness, and action.",
     images: [
       {
         url: sitelogo.src,
         width: sitelogo.width,
         height: sitelogo.height,
-        alt: "Travel to End FGM Logo",
+        alt: "Travel to End FGM Homepage",
       },
     ],
   },
+  
+  // Specific Twitter card for home page
   twitter: {
     card: "summary_large_image",
-    title: "Travel to End FGM",
-    description: "Join the movement to end Female Genital Mutilation. Learn, share, and take action with Travel to End FGM.",
-    creator: "@traveltoendfgm",
+    title: "Travel to End FGM - Make an Impact",
+    description: "Join our mission to end Female Genital Mutilation through education, awareness, and action.",
     images: [sitelogo.src],
   },
-  verification: {
-    google: "PYw-8cZRCmTG8kQsJRVAgNbrEyz0hOrR3TVVhAzi7A0",
-  },
+  
+  // Override robots for home page to ensure indexing
   robots: {
     index: true,
     follow: true,
@@ -56,5 +42,4 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  category: "Activism",
 };
