@@ -243,3 +243,6 @@
    - Use loading.tsx for suspense boundaries
 
 This process ensures a clean, type-safe conversion while maintaining functionality and improving performance through Next.js features.
+
+Please make sure to produce nextjs typescript code and not just vanilla react js code as this project is not a create react app project or a vite project. Thus you should aply logic that suits and is desgined for nextjs 14 and above.
+you do not need to run the server terminal to run the project as i am already running it on another terminal. BUt note that if you want to use the terminal for commands then you are dealing with a bash terminal and should use bash terminal command types, not cmd command types.
