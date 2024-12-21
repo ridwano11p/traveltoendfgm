@@ -1,0 +1,23 @@
+# Allow all crawlers
+User-agent: *
+
+# Allow access to most pages
+Allow: /
+Allow: /impact-stories
+Allow: /about
+Allow: /documentaries
+Allow: /research
+Allow: /gallery
+Allow: /contact
+
+# Disallow admin and creation pages
+Disallow: /create
+Disallow: /edit
+Disallow: /login
+Disallow: /admin
+
+# Sitemap location
+Sitemap: https://traveltoendfgm.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
