@@ -1,4 +1,4 @@
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import HomeClient from "@/components/shared/HomeClient";
 
@@ -11,6 +11,7 @@ export interface BlogPost {
   isYouTubeVideo?: boolean;
   tags: string[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface FeatureStory {
@@ -22,7 +23,24 @@ export interface FeatureStory {
   isYouTubeVideo?: boolean;
   tags: string[];
   createdAt: string;
+  updatedAt?: string;
 }
+
+interface FirestoreData {
+  title: string;
+  content: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  isYouTubeVideo?: boolean;
+  tags: string[];
+  createdAt: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+const convertTimestampToString = (timestamp: Timestamp | undefined): string => {
+  if (!timestamp) return '';
+  return timestamp.toDate().toISOString();
+};
 
 async function getData() {
   try {
@@ -33,10 +51,15 @@ async function getData() {
       limit(5)
     );
     const blogsSnapshot = await getDocs(blogsQuery);
-    const blogs = blogsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as BlogPost[];
+    const blogs = blogsSnapshot.docs.map((doc) => {
+      const data = doc.data() as FirestoreData;
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: convertTimestampToString(data.createdAt),
+        updatedAt: convertTimestampToString(data.updatedAt),
+      };
+    }) as BlogPost[];
 
     // Fetch feature story
     const featureQuery = query(
@@ -48,10 +71,12 @@ async function getData() {
     let featureStory: FeatureStory | null = null;
 
     if (!featureSnapshot.empty) {
-      const featureData = featureSnapshot.docs[0].data();
+      const featureData = featureSnapshot.docs[0].data() as FirestoreData;
       featureStory = {
         id: featureSnapshot.docs[0].id,
         ...featureData,
+        createdAt: convertTimestampToString(featureData.createdAt),
+        updatedAt: convertTimestampToString(featureData.updatedAt),
         tags: featureData.tags || [],
       } as FeatureStory;
     }
@@ -68,6 +93,5 @@ async function getData() {
 
 export default async function Home() {
   const data = await getData();
-
   return <HomeClient initialData={data} />;
 }

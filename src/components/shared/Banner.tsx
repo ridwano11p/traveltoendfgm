@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { useTheme } from "@/context/ThemeContext";
 import Image from "next/image";
@@ -12,7 +12,21 @@ interface BannerContent {
   mediaUrl: string;
   mediaType: "image" | "video";
   isYouTubeVideo: boolean;
+  createdAt: string;
 }
+
+interface FirestoreBannerData {
+  title: string;
+  description: string;
+  mediaUrl: string;
+  mediaType: "image" | "video";
+  isYouTubeVideo: boolean;
+  createdAt: Timestamp;
+}
+
+const convertTimestampToString = (timestamp: Timestamp): string => {
+  return timestamp.toDate().toISOString();
+};
 
 const MediaContent = ({ 
   mediaUrl, 
@@ -90,7 +104,11 @@ export default function Banner() {
         );
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
-          setBannerContent(querySnapshot.docs[0].data() as BannerContent);
+          const firestoreData = querySnapshot.docs[0].data() as FirestoreBannerData;
+          setBannerContent({
+            ...firestoreData,
+            createdAt: convertTimestampToString(firestoreData.createdAt)
+          });
         }
       } catch (err) {
         console.error("Error fetching banner content: ", err);

@@ -46,13 +46,7 @@ export default function VideoPlayer({ videoUrl, isYouTubeVideo }: VideoPlayerPro
         playsInline
       >
         <source src={videoUrl} type="video/mp4" />
-        <track 
-          kind="captions"
-          src=""
-          label="English"
-          srcLang="en"
-          default
-        />
+        {/* Removed empty track element since we don't have captions yet */}
         <p className="text-gray-500 dark:text-gray-400">
           Your browser does not support the video tag.
         </p>
