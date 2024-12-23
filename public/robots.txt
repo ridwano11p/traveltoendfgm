@@ -1,18 +1,20 @@
 # Allow all crawlers
 User-agent: *
 
-# Allow access to most pages
+# Allow access to public pages
 Allow: /
+Allow: /search-page
 Allow: /impact-stories
-Allow: /about
-Allow: /documentaries
-Allow: /research
-Allow: /gallery
+Allow: /about/who-we-are
+Allow: /about/what-we-do
+Allow: /documentaries/videos
+Allow: /research/pdfs
+Allow: /gallery/photos
 Allow: /contact
 
 # Disallow admin and creation pages
-Disallow: /create
-Disallow: /edit
+Disallow: /create/
+Disallow: /edit/
 Disallow: /login
 Disallow: /admin
 
