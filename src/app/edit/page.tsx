@@ -47,7 +47,7 @@ export default function EditPage() {
           <EditOption
             title="Edit Blog Posts"
             description="Edit or delete existing blog posts in Impact Stories."
-            link="/edit/blogs"
+            link="/edit/blog"
           />
           <EditOption
             title="Edit Feature Stories"
@@ -57,12 +57,12 @@ export default function EditPage() {
           <EditOption
             title="Edit Team Members"
             description="Update or remove team members from the 'Who We Are' section."
-            link="/edit/team-members"
+            link="/edit/team-member"
           />
           <EditOption
             title="Edit Videos"
             description="Update or remove videos from the Documentaries section."
-            link="/edit/videos"
+            link="/edit/video"
           />
           <EditOption
             title="Edit 'What We Do' Info"
@@ -73,12 +73,12 @@ export default function EditPage() {
           <EditOption
             title="Edit PDFs"
             description="Update or remove PDFs from the Research and Reports section."
-            link="/edit/pdfs"
+            link="/edit/pdf"
           />
           <EditOption
             title="Edit Photos"
             description="Update or remove photos from the Gallery section."
-            link="/edit/photos"
+            link="/edit/photo"
           />
           <EditOption
             title="Edit Contact Info"
