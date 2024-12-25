@@ -216,7 +216,7 @@ export default function NavBar() {
               <Link href="/" className="text-white hover:text-gray-200">
                 Home
               </Link>
-              <Link href="/search-page" className="text-white hover:text-gray-200">
+              <Link href="/search" className="text-white hover:text-gray-200">
                 Search
               </Link>
             </div>
