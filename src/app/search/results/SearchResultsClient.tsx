@@ -11,29 +11,7 @@ import PhotoModal from "./components/PhotoModal";
 import PDFCard from "./components/PDFCard";
 import TeamMember from "@/app/about/who-we-are/TeamMember";
 import TeamMemberModal from "@/app/about/who-we-are/TeamMemberModal";
-
-interface SearchResult {
-  id: string;
-  type: string;
-  title: string;
-  description?: string;
-  content?: string;
-  author?: string;
-  date?: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTube?: boolean;
-  pdfUrl?: string;
-  photoUrl?: string;
-  tags?: string[];
-  name?: string;
-  role?: string;
-  bio?: string;
-  linkedin?: string;
-  facebook?: string;
-  youtube?: string;
-  twitter?: string;
-}
+import { SearchResult, TeamMemberResult, ContentResult } from "@/types/search";
 
 interface SearchResultsClientProps {
   results: SearchResult[];
@@ -46,14 +24,14 @@ export default function SearchResultsClient({ results }: SearchResultsClientProp
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("q") || "";
 
-  const [selectedPhoto, setSelectedPhoto] = useState<SearchResult | null>(null);
-  const [selectedMember, setSelectedMember] = useState<SearchResult | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<ContentResult | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMemberResult | null>(null);
 
   const handleTagClick = (tag: string) => {
     router.push(`/search/results?q=${encodeURIComponent(tag)}&type=all`);
   };
 
-  const handlePhotoClick = (photo: SearchResult) => {
+  const handlePhotoClick = (photo: ContentResult) => {
     setSelectedPhoto(photo);
   };
 
@@ -61,7 +39,7 @@ export default function SearchResultsClient({ results }: SearchResultsClientProp
     setSelectedPhoto(null);
   };
 
-  const openModal = (member: SearchResult) => {
+  const openModal = (member: TeamMemberResult) => {
     setSelectedMember(member);
   };
 
@@ -72,85 +50,95 @@ export default function SearchResultsClient({ results }: SearchResultsClientProp
   const renderResultItem = (item: SearchResult) => {
     switch (item.type) {
       case "blogs":
-      case "featureStories":
+      case "featureStories": {
+        const blogItem = item as ContentResult;
         return (
           <BlogCard
             blog={{
-              id: item.id,
-              title: item.title,
-              content: item.content || "",
-              author: item.author,
-              date: item.date,
-              imageUrl: item.imageUrl,
-              videoUrl: item.videoUrl,
-              isYouTubeVideo: item.isYouTube,
-              tags: item.tags
+              id: blogItem.id,
+              title: blogItem.title,
+              content: blogItem.content || "",
+              author: blogItem.author,
+              date: blogItem.date,
+              imageUrl: blogItem.imageUrl,
+              videoUrl: blogItem.videoUrl,
+              isYouTubeVideo: blogItem.isYouTube,
+              tags: blogItem.tags
             }}
             isDark={isDark}
             onTagClick={handleTagClick}
           />
         );
+      }
 
-      case "videos":
+      case "videos": {
+        const videoItem = item as ContentResult;
         return (
           <VideoCard
             video={{
-              id: item.id,
-              title: item.title,
-              description: item.description || "",
-              videoUrl: item.videoUrl || "",
-              isYouTube: item.isYouTube,
-              thumbnailUrl: item.imageUrl
+              id: videoItem.id,
+              title: videoItem.title,
+              description: videoItem.description || "",
+              videoUrl: videoItem.videoUrl || "",
+              isYouTube: videoItem.isYouTube,
+              thumbnailUrl: videoItem.imageUrl
             }}
             isDark={isDark}
           />
         );
+      }
 
-      case "photos":
+      case "photos": {
+        const photoItem = item as ContentResult;
         return (
           <PhotoCard
             photo={{
-              id: item.id,
-              title: item.title,
-              description: item.description,
-              photoUrl: item.photoUrl || ""
+              id: photoItem.id,
+              title: photoItem.title,
+              description: photoItem.description,
+              photoUrl: photoItem.photoUrl || ""
             }}
             isDark={isDark}
-            onClick={handlePhotoClick}
+            onClick={() => handlePhotoClick(photoItem)}
           />
         );
+      }
 
-      case "pdfs":
+      case "pdfs": {
+        const pdfItem = item as ContentResult;
         return (
           <PDFCard
             pdf={{
-              id: item.id,
-              title: item.title,
-              description: item.description || "",
-              pdfUrl: item.pdfUrl || ""
+              id: pdfItem.id,
+              title: pdfItem.title,
+              description: pdfItem.description || "",
+              pdfUrl: pdfItem.pdfUrl || ""
             }}
             isDark={isDark}
           />
         );
+      }
 
-      case "team_members":
+      case "team_members": {
+        const memberItem = item as TeamMemberResult;
         return (
           <TeamMember
             member={{
-              id: item.id,
-              name: item.name || "",
-              role: item.role || "",
-              bio: item.bio || "",
-              imageUrl: item.imageUrl || "",
-              linkedin: item.linkedin,
-              facebook: item.facebook,
-              youtube: item.youtube,
-              twitter: item.twitter
+              id: memberItem.id,
+              name: memberItem.name,
+              role: memberItem.role || "",
+              bio: memberItem.bio || "",
+              imageUrl: memberItem.imageUrl || "",
+              linkedin: memberItem.linkedin,
+              facebook: memberItem.facebook,
+              youtube: memberItem.youtube,
+              twitter: memberItem.twitter
             }}
             isDark={isDark}
-            onOpenModal={openModal}
+            onOpenModal={() => openModal(memberItem)}
           />
         );
+      }
 
       default:
         return null;
@@ -200,7 +188,7 @@ export default function SearchResultsClient({ results }: SearchResultsClientProp
           <TeamMemberModal
             member={{
               id: selectedMember.id,
-              name: selectedMember.name || "",
+              name: selectedMember.name,
               role: selectedMember.role || "",
               bio: selectedMember.bio || "",
               imageUrl: selectedMember.imageUrl || "",
