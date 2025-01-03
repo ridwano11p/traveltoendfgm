@@ -8,7 +8,9 @@ Root Directory (/)
 ├── next.config.ts
 ├── package-lock.json
 ├── package.json
+├── page handling code example.txt
 ├── postcss.config.mjs
+├── project structure.txt
 ├── tailwind.config.ts
 ├── tsconfig.json
 ├── public/
