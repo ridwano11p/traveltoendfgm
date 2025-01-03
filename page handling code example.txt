@@ -1,0 +1,468 @@
+# Next.js 14+ Page Handling Code Examples
+This documentation shows how pages are structured in this Next.js project using the Contact Information edit page as an example.
+
+## Page Structure Overview
+In Next.js 14+, each route typically consists of several key files:
+- page.tsx: The main component that renders the page content
+- loading.tsx: Loading state component shown while the page is loading
+- error.tsx: Error handling component for when errors occur
+- metadata.ts: SEO and metadata configuration for the page
+
+Below are the complete implementations of these files for the Contact Information edit page:
+
+## 1. Main Page Component
+File Path: src/app/edit/contact-info/page.tsx
+Purpose: Handles the main functionality for editing contact information
+
+```typescript
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase/config';
+import { collection, query, orderBy, limit, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { FaSpinner } from 'react-icons/fa';
+
+interface ContactInfo {
+  id: string;
+  email: string;
+  phone: string;
+  location: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export default function EditContactInfo() {
+  const { theme } = useTheme();
+  const { user } = useAuth();
+  const router = useRouter();
+  const isDark = theme === 'dark';
+
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
+  const [docId, setDocId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      fetchContactInfo();
+    }
+  }, [user, router]);
+
+  const fetchContactInfo = async () => {
+    try {
+      const q = query(collection(db, 'siteContactInfo'), orderBy('createdAt', 'desc'), limit(1));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        const data = doc.data() as Omit<ContactInfo, 'id'>;
+        setEmail(data.email);
+        setPhone(data.phone || '');
+        setLocation(data.location || '');
+        setDocId(doc.id);
+      } else {
+        router.push('/create/contact-info');
+      }
+    } catch (err) {
+      console.error('Error fetching contact info: ', err);
+      setError('Failed to load contact information. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateForm = (): boolean => {
+    if (!email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Invalid email format');
+      return false;
+    }
+    if (!phone.trim()) {
+      setError('Phone number is required');
+      return false;
+    }
+    if (!location.trim()) {
+      setError('Location is required');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      const contactInfoRef = doc(db, 'siteContactInfo', docId);
+      await updateDoc(contactInfoRef, {
+        email: email.trim(),
+        phone: phone.trim(),
+        location: location.trim(),
+        updatedAt: new Date(),
+      });
+      router.push('/');
+    } catch (err) {
+      console.error('Error updating contact info: ', err);
+      setError('An error occurred while updating contact information. Please try again.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+        <FaSpinner className={`animate-spin text-4xl ${isDark ? 'text-white' : 'text-gray-800'}`} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+      <div className="max-w-2xl mx-auto px-4">
+        <h2 className={`text-3xl font-bold mb-6 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
+          Edit Contact Information
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Form fields implementation */}
+        </form>
+        {error && (
+          <div className={`mt-4 p-4 rounded-md ${isDark ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
+            {error}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 2. Loading State Component
+File Path: src/app/edit/contact-info/loading.tsx
+Purpose: Displays a loading skeleton while the page content is being fetched
+
+```typescript
+export default function EditContactInfoLoading() {
+  return (
+    <div className="min-h-screen py-12 bg-gray-100">
+      <div className="max-w-2xl mx-auto px-4">
+        {/* Title Skeleton */}
+        <div className="h-10 w-80 bg-gray-200 rounded mb-8 mx-auto" />
+        
+        {/* Form Fields Skeleton */}
+        <div className="space-y-6">
+          {/* Email Input Skeleton */}
+          <div>
+            <div className="h-4 w-16 bg-gray-200 rounded mb-2" />
+            <div className="h-12 w-full bg-gray-200 rounded" />
+          </div>
+          
+          {/* Phone Input Skeleton */}
+          <div>
+            <div className="h-4 w-16 bg-gray-200 rounded mb-2" />
+            <div className="h-12 w-full bg-gray-200 rounded" />
+          </div>
+          
+          {/* Location Input Skeleton */}
+          <div>
+            <div className="h-4 w-20 bg-gray-200 rounded mb-2" />
+            <div className="h-12 w-full bg-gray-200 rounded" />
+          </div>
+          
+          {/* Action Buttons Skeleton */}
+          <div className="flex justify-end space-x-4">
+            <div className="h-10 w-24 bg-gray-200 rounded" />
+            <div className="h-10 w-48 bg-gray-300 rounded" />
+          </div>
+        </div>
+        
+        {/* Error Message Placeholder */}
+        <div className="h-16 w-full bg-gray-200 rounded mt-4 hidden" />
+      </div>
+    </div>
+  );
+}
+```
+
+## 3. Error Handling Component
+File Path: src/app/edit/contact-info/error.tsx
+Purpose: Displays error information and recovery options when an error occurs
+
+```typescript
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface ErrorProps {
+  error: Error & { digest?: string };
+  reset: () => void;
+}
+
+export default function EditContactInfoError({ error, reset }: ErrorProps) {
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error("Contact information editing error:", error);
+  }, [error]);
+
+  return (
+    <div className="min-h-screen py-12 bg-gray-50">
+      <div className="max-w-xl mx-auto px-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Error Updating Contact Information
+          </h2>
+          <p className="text-gray-600 mb-8">
+            We encountered an error while trying to update the contact information. Please try again or return to the dashboard.
+          </p>
+          <div className="space-x-4">
+            <button onClick={reset} className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Try again
+            </button>
+            <button onClick={() => router.push('/edit')} className="inline-flex items-center px-4 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Return to Edit Dashboard
+            </button>
+          </div>
+          {error.message && (
+            <div className="mt-6 p-4 bg-red-50 rounded-md">
+              <p className="text-sm text-red-700">
+                Error details: {error.message}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## 4. Metadata Configuration
+File Path: src/app/edit/contact-info/metadata.ts
+Purpose: Defines SEO metadata and page information
+
+```typescript
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Edit Contact Information | Travel to End FGM",
+  description: "Edit contact information for Travel to End FGM website.",
+  openGraph: {
+    title: "Edit Contact Information | Travel to End FGM",
+    description: "Edit contact information for Travel to End FGM website.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Travel to End FGM"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Edit Contact Information | Travel to End FGM",
+    description: "Edit contact information for Travel to End FGM website."
+  },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true
+    }
+  }
+};
+```
+
+## Key Concepts and Patterns
+
+1. Client Components:
+   - Both page.tsx and error.tsx are marked with "use client" directive
+   - This enables client-side interactivity and state management
+
+2. Loading States:
+   - The loading.tsx file provides a skeleton UI while data is being fetched
+   - The main component also handles internal loading states for user feedback
+
+3. Error Handling:
+   - Comprehensive error handling both in the main component and dedicated error.tsx
+   - User-friendly error messages and recovery options
+
+4. SEO and Metadata:
+   - Metadata is configured using Next.js 14's metadata API
+   - Includes OpenGraph and Twitter card configurations
+   - Proper robots directives for admin pages
+
+5. Form Handling:
+   - Client-side form validation
+   - Proper error state management
+   - Loading states during form submission
+
+6. Authentication:
+   - Protected routes with user authentication checks
+   - Redirect to login if user is not authenticated
+
+7. Theme Support:
+   - Dark/light theme implementation
+   - Consistent styling across different theme modes
+
+## Dynamic Routing with Firebase Integration
+
+Next.js 14+ supports dynamic routes through folder names with square brackets (e.g., [id]). Here's how dynamic routing is implemented in this project using the article feature as an example:
+
+### 1. Dynamic Route Structure
+File Path: src/app/article/[id]/page.tsx
+
+The [id] folder name creates a dynamic route where the ID segment can be any value. This ID is then available as a parameter in the page component.
+
+```typescript
+// Example of dynamic route handling
+interface Props {
+  params: {
+    id: string;  // This matches the [id] folder name
+  };
+}
+
+export default async function ArticlePage({ params }: Props) {
+  const id = await Promise.resolve(params.id);
+  const article = await getArticle(id);
+
+  if (!article) {
+    notFound();  // Next.js built-in 404 handling
+  }
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ArticleClient article={article} />
+    </Suspense>
+  );
+}
+```
+
+### 2. Firebase Integration
+The project uses Firebase Firestore to store and retrieve articles. Here's how data fetching works:
+
+```typescript
+async function getArticle(id: string): Promise<ArticleData | null> {
+  try {
+    // Try to fetch from 'blogs' collection
+    let docRef = doc(db, "blogs", id);
+    let docSnap = await getDoc(docRef);
+
+    // If not found in 'blogs', try 'featureStories'
+    if (!docSnap.exists()) {
+      docRef = doc(db, "featureStories", id);
+      docSnap = await getDoc(docRef);
+    }
+
+    if (!docSnap.exists()) {
+      return null;
+    }
+
+    const data = docSnap.data();
+    
+    // Convert Firestore Timestamps to regular dates
+    const createdAt = data.createdAt?.toDate?.() || null;
+    const updatedAt = data.updatedAt?.toDate?.() || null;
+
+    return {
+      id: docSnap.id,
+      ...data,
+      createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
+      updatedAt: updatedAt ? new Date(updatedAt).toISOString() : undefined,
+    } as ArticleData;
+  } catch (error) {
+    console.error("Error fetching article:", error);
+    throw new Error("Failed to fetch article");
+  }
+}
+```
+
+### 3. Dynamic Metadata Generation
+Next.js 14+ allows generating dynamic metadata based on the route parameters:
+
+```typescript
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  try {
+    const id = await Promise.resolve(params.id);
+    // Fetch article data
+    let docRef = doc(db, "blogs", id);
+    let docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      docRef = doc(db, "featureStories", id);
+      docSnap = await getDoc(docRef);
+    }
+
+    const data = docSnap.data() as ArticleData;
+
+    return {
+      title: `${data.title} | Travel to End FGM`,
+      description: data.description || data.content.substring(0, 155) + "...",
+      openGraph: {
+        title: data.title,
+        description: data.description || data.content.substring(0, 155) + "...",
+        type: "article",
+        ...(data.imageUrl && { images: [data.imageUrl] }),
+        publishedTime: data.date,
+        authors: data.author ? [data.author] : undefined,
+      },
+      // ... additional metadata
+    };
+  } catch (error) {
+    // Fallback metadata
+    return {
+      title: "Article | Travel to End FGM",
+      description: "Read our latest articles and stories about ending FGM.",
+    };
+  }
+}
+```
+
+### 4. Client-Side Rendering
+The article content is rendered using a client component (ArticleClient.tsx) which handles:
+- Media content (images and videos)
+- Formatting
+- Theme adaptation
+- Interactive elements
+
+### Key Concepts for Dynamic Routes:
+
+1. Route Parameters:
+   - Dynamic segments are defined using [paramName] in folder names
+   - Parameters are passed to page components via the params prop
+
+2. Data Fetching:
+   - Server components can fetch data directly in the page component
+   - Firebase queries are executed server-side for better performance
+   - Data is passed to client components as props
+
+3. Error Handling:
+   - Built-in notFound() function for 404 errors
+   - Try-catch blocks for Firebase operations
+   - Fallback states for loading and errors
+
+4. SEO Optimization:
+   - Dynamic metadata generation based on content
+   - OpenGraph and Twitter card support
+   - Proper handling of missing content
+
+5. Performance:
+   - Server-side data fetching
+   - Client-side rendering for interactive elements
+   - Suspense boundaries for loading states
