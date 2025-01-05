@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { getContentExistence } from '@/utils/contentChecks';
 import EditOption from '@/components/shared/EditOption';
+import StorageInfo from '@/components/shared/storage/StorageInfo';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -40,9 +41,13 @@ export default function EditPage() {
   return (
     <div className={`min-h-screen py-12 ${theme === 'dark' ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className={`text-4xl font-bold mb-8 text-center ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
-          Edit Content
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+            Edit Content
+          </h1>
+          <StorageInfo />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <EditOption
             title="Edit Blog Posts"
