@@ -1,7 +1,8 @@
 import { Metadata } from "next";
-import { collection, query, orderBy, limit, getDocs, startAfter, Timestamp, getCountFromServer, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, startAfter, Timestamp, getCountFromServer } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import ImpactStoriesClient from "./ImpactStoriesClient";
+import { redirect } from "next/navigation";
 
 interface BlogPost {
   id: string;
@@ -15,9 +16,10 @@ interface BlogPost {
   tags?: string[];
 }
 
-interface PageProps {
+type Props = {
+  params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
-}
+};
 
 const BLOGS_PER_PAGE = 4;
 
@@ -56,31 +58,29 @@ const convertTimestampToString = (timestamp: Timestamp | undefined): string => {
 
 async function getBlogs(page: number) {
   try {
-    // Get total count for pagination
     const blogsCollection = collection(db, "blogs");
     const snapshot = await getCountFromServer(blogsCollection);
     const totalBlogs = snapshot.data().count;
     const totalPages = Math.ceil(totalBlogs / BLOGS_PER_PAGE);
 
-    // Base query
+    // Ensure page is within valid range
+    const validPage = Math.max(1, Math.min(page, totalPages));
+
     let q = query(
       blogsCollection,
       orderBy("createdAt", "desc"),
       limit(BLOGS_PER_PAGE)
     );
 
-    // If not the first page, get the document to start after
-    if (page > 1) {
-      // Get the last document of the previous page
+    if (validPage > 1) {
       const previousPageQuery = query(
         blogsCollection,
         orderBy("createdAt", "desc"),
-        limit((page - 1) * BLOGS_PER_PAGE)
+        limit((validPage - 1) * BLOGS_PER_PAGE)
       );
       const previousPageDocs = await getDocs(previousPageQuery);
       const lastVisibleDoc = previousPageDocs.docs[previousPageDocs.docs.length - 1];
-      
-      // Update query with startAfter
+
       q = query(
         blogsCollection,
         orderBy("createdAt", "desc"),
@@ -108,6 +108,7 @@ async function getBlogs(page: number) {
     return {
       blogs,
       totalPages,
+      currentPage: validPage,
     };
   } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -115,9 +116,27 @@ async function getBlogs(page: number) {
   }
 }
 
-export default async function ImpactStoriesPage({ searchParams }: PageProps) {
-  const currentPage = Number(searchParams.page) || 1;
-  const { blogs, totalPages } = await getBlogs(currentPage);
+export default async function ImpactStoriesPage(props: Props) {
+  const page = props.searchParams?.page;
+  const requestedPage = Math.max(1, Number(Array.isArray(page) ? page[0] : page) || 1);
 
-  return <ImpactStoriesClient blogs={blogs} totalPages={totalPages} />;
+  try {
+    const { blogs, totalPages, currentPage } = await getBlogs(requestedPage);
+
+    // Redirect if requested page is invalid
+    if (requestedPage > totalPages) {
+      redirect(`/impact-stories?page=${totalPages}`);
+    }
+
+    return (
+      <ImpactStoriesClient
+        blogs={blogs}
+        totalPages={totalPages}
+        currentPage={currentPage}
+      />
+    );
+  } catch (error) {
+    console.error("Error in ImpactStoriesPage:", error);
+    throw new Error("Failed to load impact stories");
+  }
 }

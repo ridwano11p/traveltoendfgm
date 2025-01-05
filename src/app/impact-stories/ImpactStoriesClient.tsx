@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import { AnimatePresence } from "framer-motion";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
@@ -21,30 +22,28 @@ interface BlogPost {
 interface ImpactStoriesClientProps {
   blogs: BlogPost[];
   totalPages: number;
+  currentPage: number;
 }
 
-export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStoriesClientProps) {
+export default function ImpactStoriesClient({
+  blogs,
+  totalPages,
+  currentPage: initialPage
+}: ImpactStoriesClientProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentPage = Number(searchParams.get("page")) || 1;
+  const [currentPage, setCurrentPage] = useState(initialPage);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", newPage.toString());
-      router.push(`/impact-stories?${params.toString()}`);
+      setCurrentPage(newPage);
+      router.push(`/impact-stories?page=${newPage}`);
     }
   };
 
-  const handleFirstPage = () => {
-    handlePageChange(1);
-  };
-
-  const handleLastPage = () => {
-    handlePageChange(totalPages);
-  };
+  const handleFirstPage = () => handlePageChange(1);
+  const handleLastPage = () => handlePageChange(totalPages);
 
   const handleTagClick = (tag: string) => {
     router.push(`/tag/${encodeURIComponent(tag)}`);
@@ -57,22 +56,18 @@ export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStories
     let startPage: number;
     let endPage: number;
 
-    // Calculate the range of pages to show
     if (currentPage <= 3) {
-      // If current page is near the start
       startPage = 1;
       endPage = Math.min(5, totalPages);
     } else if (currentPage >= totalPages - 2) {
-      // If current page is near the end
       startPage = Math.max(1, totalPages - 4);
       endPage = totalPages;
     } else {
-      // If current page is in the middle
       startPage = currentPage - 2;
       endPage = currentPage + 2;
     }
 
-    // Add first page button if not starting from page 1
+    // First page button
     if (startPage > 1) {
       pageNumbers.push(
         <button
@@ -94,7 +89,7 @@ export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStories
       }
     }
 
-    // Add page numbers
+    // Page numbers
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(
         <button
@@ -111,7 +106,7 @@ export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStories
       );
     }
 
-    // Add last page button if not ending at the last page
+    // Last page button
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
         pageNumbers.push(
@@ -145,11 +140,11 @@ export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStories
 
         <AnimatePresence mode="wait">
           {blogs.map((post) => (
-            <BlogPost 
-              key={post.id} 
-              post={post} 
-              isDark={isDark} 
-              onTagClick={handleTagClick} 
+            <BlogPost
+              key={post.id}
+              post={post}
+              isDark={isDark}
+              onTagClick={handleTagClick}
             />
           ))}
         </AnimatePresence>
@@ -165,9 +160,9 @@ export default function ImpactStoriesClient({ blogs, totalPages }: ImpactStories
             >
               <FaArrowLeft />
             </button>
-            
+
             {renderPageNumbers()}
-            
+
             <button
               onClick={handleLastPage}
               disabled={currentPage === totalPages}
