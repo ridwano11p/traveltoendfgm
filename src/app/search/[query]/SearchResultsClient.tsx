@@ -5,7 +5,16 @@ import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { FaSpinner } from 'react-icons/fa';
-import { SearchResult } from '../types';
+import {
+  SearchResult,
+  BlogSearchResult,
+  VideoSearchResult,
+  PhotoSearchResult,
+  PDFSearchResult,
+  TeamMemberSearchResult,
+  Photo,
+  TeamMember
+} from '../types';
 import BlogCard from '../components/results/BlogCard';
 import VideoCard from '../components/results/VideoCard';
 import PhotoCard from '../components/results/PhotoCard';
@@ -25,57 +34,83 @@ export default function SearchResultsClient({ results, searchTerm, error }: Prop
   const router = useRouter();
   const isDark = theme === 'dark';
 
-  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
-  const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
   const handleTagClick = (tag: string) => {
     router.push(`/search/${encodeURIComponent(tag)}`);
   };
 
+  const isBlogResult = (result: SearchResult): result is BlogSearchResult => {
+    return result.type === 'blogs' || result.type === 'featureStories';
+  };
+
+  const isVideoResult = (result: SearchResult): result is VideoSearchResult => {
+    return result.type === 'videos';
+  };
+
+  const isPhotoResult = (result: SearchResult): result is PhotoSearchResult => {
+    return result.type === 'photos';
+  };
+
+  const isPDFResult = (result: SearchResult): result is PDFSearchResult => {
+    return result.type === 'pdfs';
+  };
+
+  const isTeamMemberResult = (result: SearchResult): result is TeamMemberSearchResult => {
+    return result.type === 'team_members';
+  };
+
   const renderResultItem = (item: SearchResult) => {
-    switch (item.type) {
-      case 'blogs':
-      case 'featureStories':
-        return (
-          <BlogCard
-            blog={item}
-            isDark={isDark}
-            onTagClick={handleTagClick}
-          />
-        );
-      case 'videos':
-        return (
-          <VideoCard
-            video={item}
-            isDark={isDark}
-          />
-        );
-      case 'photos':
-        return (
-          <PhotoCard
-            photo={item}
-            isDark={isDark}
-            onClick={setSelectedPhoto}
-          />
-        );
-      case 'pdfs':
-        return (
-          <PDFCard
-            pdf={item}
-            isDark={isDark}
-          />
-        );
-      case 'team_members':
-        return (
-          <TeamMemberCard
-            member={item}
-            isDark={isDark}
-            onOpenModal={setSelectedMember}
-          />
-        );
-      default:
-        return null;
+    if (isBlogResult(item)) {
+      return (
+        <BlogCard
+          blog={item}
+          isDark={isDark}
+          onTagClick={handleTagClick}
+        />
+      );
     }
+
+    if (isVideoResult(item)) {
+      return (
+        <VideoCard
+          video={item}
+          isDark={isDark}
+        />
+      );
+    }
+
+    if (isPhotoResult(item)) {
+      return (
+        <PhotoCard
+          photo={item}
+          isDark={isDark}
+          onClick={setSelectedPhoto}
+        />
+      );
+    }
+
+    if (isPDFResult(item)) {
+      return (
+        <PDFCard
+          pdf={item}
+          isDark={isDark}
+        />
+      );
+    }
+
+    if (isTeamMemberResult(item)) {
+      return (
+        <TeamMemberCard
+          member={item}
+          isDark={isDark}
+          onOpenModal={setSelectedMember}
+        />
+      );
+    }
+
+    return null;
   };
 
   if (error) {

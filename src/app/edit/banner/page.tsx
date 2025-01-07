@@ -8,6 +8,7 @@ import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { FaSpinner, FaEdit, FaTrash, FaImage, FaVideo, FaYoutube } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface Banner {
   id: string;
@@ -16,7 +17,9 @@ interface Banner {
   mediaUrl: string;
   mediaType: 'image' | 'video' | 'youtube';
   isYouTube?: boolean;
-  youtubeId?: string;
+  youtubeId?: string | undefined;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface State {
@@ -136,9 +139,9 @@ export default function EditBanner() {
     return youtubeRegex.test(url);
   };
 
-  const extractYoutubeId = (url: string): string | null => {
+  const extractYoutubeId = (url: string): string | undefined => {
     const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/);
-    return match ? match[1] : null;
+    return match ? match[1] : undefined;
   };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -173,10 +176,13 @@ export default function EditBanner() {
 
       if (state.isLocalMedia) {
         if (state.newMediaFile) {
-          // Delete old media if it exists
           if (state.editingBanner.mediaUrl && state.editingBanner.mediaType !== 'youtube') {
-            const oldMediaRef = ref(storage, state.editingBanner.mediaUrl);
-            await deleteObject(oldMediaRef);
+            try {
+              const oldMediaRef = ref(storage, state.editingBanner.mediaUrl);
+              await deleteObject(oldMediaRef);
+            } catch (error) {
+              console.error("Error deleting old media:", error);
+            }
           }
 
           const mediaRef = ref(storage, `bannerstorage/${Date.now()}_${state.newMediaFile.name}`);
@@ -186,20 +192,23 @@ export default function EditBanner() {
           updateData.mediaType = state.newMediaFile.type.startsWith('image/') ? 'image' : 'video';
         }
 
-        // Remove YouTube-related fields if switching to local media
         updateData.isYouTube = false;
-        updateData.youtubeId = null;
+        updateData.youtubeId = undefined;
       } else {
-        // If changing from local to YouTube, delete local media
         if (state.editingBanner.mediaUrl && state.editingBanner.mediaType !== 'youtube') {
-          const oldMediaRef = ref(storage, state.editingBanner.mediaUrl);
-          await deleteObject(oldMediaRef);
+          try {
+            const oldMediaRef = ref(storage, state.editingBanner.mediaUrl);
+            await deleteObject(oldMediaRef);
+          } catch (error) {
+            console.error("Error deleting old media:", error);
+          }
         }
 
+        const youtubeId = extractYoutubeId(state.tempYoutubeUrl);
         updateData.mediaUrl = state.tempYoutubeUrl;
         updateData.mediaType = 'youtube';
         updateData.isYouTube = true;
-        updateData.youtubeId = extractYoutubeId(state.tempYoutubeUrl);
+        updateData.youtubeId = youtubeId;
       }
 
       await updateDoc(bannerRef, updateData);
@@ -216,12 +225,16 @@ export default function EditBanner() {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const bannerToDelete = state.banners.find(b => b.id === bannerId);
-        
+
         if (bannerToDelete?.mediaUrl && bannerToDelete.mediaType !== 'youtube') {
-          const mediaRef = ref(storage, bannerToDelete.mediaUrl);
-          await deleteObject(mediaRef);
+          try {
+            const mediaRef = ref(storage, bannerToDelete.mediaUrl);
+            await deleteObject(mediaRef);
+          } catch (error) {
+            console.error("Error deleting media:", error);
+          }
         }
-        
+
         await deleteDoc(doc(db, 'banners', bannerId));
         dispatch({ type: 'REMOVE_BANNER', payload: bannerId });
         dispatch({ type: 'SET_LOADING', payload: false });
@@ -325,7 +338,14 @@ export default function EditBanner() {
                   <div className="mt-4">
                     <label className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Current Media</label>
                     {state.editingBanner.mediaType === 'image' ? (
-                      <img src={state.editingBanner.mediaUrl} alt="Current Banner" className="max-w-full h-auto rounded-md" />
+                      <div className="relative w-full h-48">
+                        <Image
+                          src={state.editingBanner.mediaUrl}
+                          alt="Current Banner"
+                          fill
+                          className="object-cover rounded-md"
+                        />
+                      </div>
                     ) : (
                       <video src={state.editingBanner.mediaUrl} controls className="max-w-full h-auto rounded-md" />
                     )}
@@ -373,7 +393,14 @@ export default function EditBanner() {
               <div key={banner.id} className={`p-6 rounded-lg shadow-md ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
                 <div className="relative mb-4">
                   {banner.mediaType === 'image' ? (
-                    <img src={banner.mediaUrl} alt={banner.title} className="w-full h-48 object-cover rounded-md" />
+                    <div className="relative w-full h-48">
+                      <Image
+                        src={banner.mediaUrl}
+                        alt={banner.title}
+                        fill
+                        className="object-cover rounded-md"
+                      />
+                    </div>
                   ) : banner.mediaType === 'video' ? (
                     <video src={banner.mediaUrl} className="w-full h-48 object-cover rounded-md" controls />
                   ) : (

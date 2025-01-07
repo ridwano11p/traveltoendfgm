@@ -1,41 +1,7 @@
 import { collection, query, orderBy, limit, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
-import HomeClient from "@/components/shared/HomeClient";
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  content: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTubeVideo?: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface FeatureStory {
-  id: string;
-  title: string;
-  content: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTubeVideo?: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt?: string;
-}
-
-interface FirestoreData {
-  title: string;
-  content: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTubeVideo?: boolean;
-  tags: string[];
-  createdAt: Timestamp;
-  updatedAt?: Timestamp;
-}
+import HomeClient from "./components/HomeClient";
+import { BlogPost, FeatureStory, FirestoreData } from "./types";
 
 const convertTimestampToString = (timestamp: Timestamp | undefined): string => {
   if (!timestamp) return '';
@@ -55,7 +21,12 @@ async function getData() {
       const data = doc.data() as FirestoreData;
       return {
         id: doc.id,
-        ...data,
+        title: data.title,
+        content: data.content,
+        imageUrl: data.imageUrl,
+        videoUrl: data.videoUrl,
+        isYouTubeVideo: data.isYouTubeVideo,
+        tags: data.tags || [],
         createdAt: convertTimestampToString(data.createdAt),
         updatedAt: convertTimestampToString(data.updatedAt),
       };
@@ -74,10 +45,14 @@ async function getData() {
       const featureData = featureSnapshot.docs[0].data() as FirestoreData;
       featureStory = {
         id: featureSnapshot.docs[0].id,
-        ...featureData,
+        title: featureData.title,
+        content: featureData.content,
+        imageUrl: featureData.imageUrl,
+        videoUrl: featureData.videoUrl,
+        isYouTubeVideo: featureData.isYouTubeVideo,
+        tags: featureData.tags || [],
         createdAt: convertTimestampToString(featureData.createdAt),
         updatedAt: convertTimestampToString(featureData.updatedAt),
-        tags: featureData.tags || [],
       } as FeatureStory;
     }
 

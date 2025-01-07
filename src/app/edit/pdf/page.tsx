@@ -22,6 +22,19 @@ interface PDF {
   updatedAt: Date;
 }
 
+interface PDFUpdateBase {
+  title: string;
+  description: string;
+  updatedAt: Date;
+  [key: string]: any; // Add index signature to allow dynamic properties
+}
+
+interface PDFUpdateWithFile extends PDFUpdateBase {
+  pdfUrl: string;
+  fileName: string;
+  storageFileName: string;
+}
+
 export default function EditPDF() {
   const { theme } = useTheme();
   const { user } = useAuth();
@@ -83,7 +96,7 @@ export default function EditPDF() {
 
   const validateForm = (): boolean => {
     if (!editingPdf) return false;
-    
+
     if (editingPdf.title.trim().length < 3) {
       setError("Title must be at least 3 characters long.");
       return false;
@@ -106,7 +119,7 @@ export default function EditPDF() {
     setUpdating(true);
     try {
       const pdfRef = doc(db, 'pdfs', editingPdf.id);
-      let updateData = {
+      const baseUpdate: PDFUpdateBase = {
         title: editingPdf.title.trim(),
         description: editingPdf.description.trim(),
         updatedAt: new Date()
@@ -116,22 +129,30 @@ export default function EditPDF() {
         // Delete old PDF if it exists
         if (editingPdf.pdfUrl) {
           const oldPdfRef = ref(storage, editingPdf.pdfUrl);
-          await deleteObject(oldPdfRef);
+          try {
+            await deleteObject(oldPdfRef);
+          } catch (error) {
+            console.error("Error deleting old PDF:", error);
+          }
         }
 
         const fileName = `${Date.now()}_${newPdfFile.name}`;
         const pdfFileRef = ref(storage, `pdfs/${fileName}`);
         await uploadBytes(pdfFileRef, newPdfFile);
         const pdfUrl = await getDownloadURL(pdfFileRef);
-        updateData = {
-          ...updateData,
+
+        const updateWithFile: PDFUpdateWithFile = {
+          ...baseUpdate,
           pdfUrl,
           fileName: newPdfFile.name,
           storageFileName: fileName
         };
+
+        await updateDoc(pdfRef, updateWithFile as { [key: string]: any });
+      } else {
+        await updateDoc(pdfRef, baseUpdate as { [key: string]: any });
       }
 
-      await updateDoc(pdfRef, updateData);
       setEditingPdf(null);
       fetchPdfs();
     } catch (err) {
