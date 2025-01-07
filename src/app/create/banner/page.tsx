@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ThemeContext } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -17,9 +17,10 @@ interface FormData {
 }
 
 export default function CreateBanner() {
-  const { darkMode } = useContext(ThemeContext);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
@@ -27,7 +28,7 @@ export default function CreateBanner() {
     youtubeUrl: '',
     isLocalMedia: true
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,14 +116,14 @@ export default function CreateBanner() {
   };
 
   return (
-    <div className={`min-h-screen py-12 ${darkMode ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+    <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className={`text-4xl font-bold mb-8 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+        <h1 className={`text-4xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
           Create New Banner
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Title</label>
+            <label htmlFor="title" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Title</label>
             <input
               type="text"
               id="title"
@@ -131,12 +132,12 @@ export default function CreateBanner() {
               required
               minLength={3}
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div>
-            <label htmlFor="description" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Description</label>
+            <label htmlFor="description" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Description</label>
             <textarea
               id="description"
               value={formData.description}
@@ -145,12 +146,12 @@ export default function CreateBanner() {
               minLength={10}
               rows={5}
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div className="flex items-center space-x-4">
-            <label className={`flex items-center ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+            <label className={`flex items-center ${isDark ? 'text-white' : 'text-gray-700'}`}>
               <input
                 type="checkbox"
                 checked={formData.isLocalMedia}
@@ -159,7 +160,7 @@ export default function CreateBanner() {
               />
               Upload Local Media
             </label>
-            <label className={`flex items-center ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+            <label className={`flex items-center ${isDark ? 'text-white' : 'text-gray-700'}`}>
               <input
                 type="checkbox"
                 checked={!formData.isLocalMedia}
@@ -171,20 +172,20 @@ export default function CreateBanner() {
           </div>
           {formData.isLocalMedia ? (
             <div>
-              <label htmlFor="mediaFile" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Upload Media File</label>
+              <label htmlFor="mediaFile" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Upload Media File</label>
               <input
                 type="file"
                 id="mediaFile"
                 onChange={handleMediaFileChange}
                 accept="image/*,video/*"
                 className={`w-full px-3 py-2 border rounded-md ${
-                  darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                  isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
                 }`}
               />
             </div>
           ) : (
             <div>
-              <label htmlFor="youtubeUrl" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>YouTube Video URL</label>
+              <label htmlFor="youtubeUrl" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>YouTube Video URL</label>
               <input
                 type="url"
                 id="youtubeUrl"
@@ -192,7 +193,7 @@ export default function CreateBanner() {
                 onChange={(e) => setFormData(prev => ({ ...prev, youtubeUrl: e.target.value }))}
                 placeholder="https://www.youtube.com/watch?v=..."
                 className={`w-full px-3 py-2 border rounded-md ${
-                  darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                  isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
                 }`}
               />
             </div>
@@ -201,7 +202,7 @@ export default function CreateBanner() {
             type="submit"
             disabled={loading}
             className={`w-full px-4 py-2 rounded-md ${
-              darkMode
+              isDark
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             } transition duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -214,7 +215,7 @@ export default function CreateBanner() {
           </button>
         </form>
         {error && (
-          <div className={`mt-4 p-4 rounded-md ${darkMode ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
+          <div className={`mt-4 p-4 rounded-md ${isDark ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
             {error}
           </div>
         )}
