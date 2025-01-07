@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ThemeContext } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -21,7 +21,8 @@ interface FeatureStoryFormData {
 }
 
 export default function CreateFeatureStory() {
-  const { darkMode } = useContext(ThemeContext);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const router = useRouter();
 
   const [formData, setFormData] = useState<FeatureStoryFormData>({
@@ -157,14 +158,14 @@ export default function CreateFeatureStory() {
   };
 
   return (
-    <div className={`min-h-screen py-12 ${darkMode ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+    <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className={`text-4xl font-bold mb-8 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+        <h1 className={`text-4xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
           Create New Feature Story
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Title</label>
+            <label htmlFor="title" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Title</label>
             <input
               type="text"
               id="title"
@@ -173,12 +174,12 @@ export default function CreateFeatureStory() {
               required
               minLength={5}
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div>
-            <label htmlFor="author" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Author</label>
+            <label htmlFor="author" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Author</label>
             <input
               type="text"
               id="author"
@@ -187,12 +188,12 @@ export default function CreateFeatureStory() {
               required
               minLength={2}
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div>
-            <label htmlFor="content" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Content</label>
+            <label htmlFor="content" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Content</label>
             <textarea
               id="content"
               value={formData.content}
@@ -201,24 +202,24 @@ export default function CreateFeatureStory() {
               minLength={50}
               rows={10}
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div>
-            <label htmlFor="image" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Image</label>
+            <label htmlFor="image" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Image</label>
             <input
               type="file"
               id="image"
               onChange={handleImageChange}
               accept="image/*"
               className={`w-full px-3 py-2 border rounded-md ${
-                darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
           <div>
-            <label className={`flex items-center mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+            <label className={`flex items-center mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
               <input
                 type="checkbox"
                 checked={formData.isYouTubeVideo}
@@ -234,7 +235,7 @@ export default function CreateFeatureStory() {
                 onChange={(e) => setFormData(prev => ({ ...prev, youTubeUrl: e.target.value }))}
                 placeholder="Enter YouTube URL"
                 className={`w-full px-3 py-2 border rounded-md ${
-                  darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                  isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
                 }`}
               />
             ) : (
@@ -243,25 +244,25 @@ export default function CreateFeatureStory() {
                 onChange={handleVideoChange}
                 accept="video/*"
                 className={`w-full px-3 py-2 border rounded-md ${
-                  darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                  isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
                 }`}
               />
             )}
           </div>
           <div>
-            <label htmlFor="tags" className={`block mb-2 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Tags</label>
+            <label htmlFor="tags" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Tags</label>
             <div className="flex flex-wrap mb-2">
               {formData.tags.map((tag, index) => (
-                <span 
-                  key={index} 
+                <span
+                  key={index}
                   className={`${
-                    darkMode ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'
+                    isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'
                   } px-2 py-1 rounded-full text-sm font-semibold mr-2 mb-2 flex items-center`}
                 >
                   {tag}
-                  <button 
-                    type="button" 
-                    onClick={() => handleRemoveTag(tag)} 
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
                     className="ml-1 focus:outline-none"
                   >
                     <FaTimes className="h-3 w-3" />
@@ -276,14 +277,14 @@ export default function CreateFeatureStory() {
                 onChange={(e) => setFormData(prev => ({ ...prev, currentTag: e.target.value }))}
                 placeholder="Add a tag"
                 className={`flex-grow px-3 py-2 border rounded-l-md ${
-                  darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+                  isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
                 }`}
               />
               <button
                 type="button"
                 onClick={handleAddTag}
                 className={`px-4 py-2 rounded-r-md ${
-                  darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+                  isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
                 } text-white`}
               >
                 Add Tag
@@ -294,7 +295,7 @@ export default function CreateFeatureStory() {
             type="submit"
             disabled={loading}
             className={`w-full px-4 py-2 rounded-md ${
-              darkMode
+              isDark
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             } transition duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -307,7 +308,7 @@ export default function CreateFeatureStory() {
           </button>
         </form>
         {error && (
-          <div className={`mt-4 p-4 rounded-md ${darkMode ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
+          <div className={`mt-4 p-4 rounded-md ${isDark ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
             {error}
           </div>
         )}
