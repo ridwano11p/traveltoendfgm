@@ -216,7 +216,7 @@ export default function NavBar() {
               <Link href="/" className="text-white hover:text-gray-200">
                 Home
               </Link>
-              <Link href="/search-page" className="text-white hover:text-gray-200">
+              <Link href="/search" className="text-white hover:text-gray-200">
                 Search
               </Link>
             </div>
@@ -363,7 +363,7 @@ export default function NavBar() {
                   Home
                 </Link>
                 <Link
-                  href="/search-page"
+                  href="/search"
                   className="text-white hover:text-gray-200 py-2"
                   onClick={() => dispatch({ type: "CLOSE_ALL" })}
                 >
