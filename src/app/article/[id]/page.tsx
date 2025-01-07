@@ -4,21 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { notFound } from "next/navigation";
 import ArticleClient from "./ArticleClient";
-
-interface ArticleData {
-  id: string;
-  title: string;
-  content: string;
-  author?: string;
-  date?: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTubeVideo?: boolean;
-  tags?: string[];
-  description?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { ArticleData } from "./types";
 
 interface Props {
   params: {
@@ -26,7 +12,6 @@ interface Props {
   };
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const id = await Promise.resolve(params.id);
@@ -93,17 +78,25 @@ async function getArticle(id: string): Promise<ArticleData | null> {
     }
 
     const data = docSnap.data();
-    
-    // Convert Firestore Timestamps to regular dates
+
+    // Convert Firestore Timestamps to ISO strings
     const createdAt = data.createdAt?.toDate?.() || null;
     const updatedAt = data.updatedAt?.toDate?.() || null;
 
     return {
       id: docSnap.id,
-      ...data,
-      createdAt: createdAt ? new Date(createdAt).toISOString() : undefined,
-      updatedAt: updatedAt ? new Date(updatedAt).toISOString() : undefined,
-    } as ArticleData;
+      title: data.title,
+      content: data.content,
+      author: data.author,
+      date: data.date,
+      imageUrl: data.imageUrl,
+      videoUrl: data.videoUrl,
+      isYouTubeVideo: data.isYouTubeVideo,
+      tags: data.tags,
+      description: data.description,
+      createdAt: createdAt ? createdAt.toISOString() : undefined,
+      updatedAt: updatedAt ? updatedAt.toISOString() : undefined,
+    };
   } catch (error) {
     console.error("Error fetching article:", error);
     throw new Error("Failed to fetch article");
