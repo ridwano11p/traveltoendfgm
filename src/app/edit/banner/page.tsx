@@ -168,7 +168,7 @@ export default function EditBanner() {
 
     try {
       const bannerRef = doc(db, 'banners', state.editingBanner.id);
-      let updateData: Partial<Banner> & { updatedAt: Date } = {
+      const updateData: Partial<Banner> & { updatedAt: Date } = {
         title: state.editingBanner.title.trim(),
         description: state.editingBanner.description.trim(),
         updatedAt: new Date()

@@ -86,7 +86,7 @@ export default function CreateBanner() {
 
     try {
       let mediaUrl = youtubeUrl;
-      let mediaType = isLocalMedia ? (mediaFile?.type.startsWith('image/') ? 'image' : 'video') : 'youtube';
+      const mediaType = isLocalMedia ? (mediaFile?.type.startsWith('image/') ? 'image' : 'video') : 'youtube';
 
       if (isLocalMedia && mediaFile) {
         const mediaRef = ref(storage, `bannerstorage/${mediaFile.name}`);

@@ -8,6 +8,7 @@ import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { FaSpinner, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface Story {
   id: string;
@@ -235,7 +236,7 @@ export default function EditFeatureStory() {
 
     try {
       const storyRef = doc(db, 'featureStories', state.editingStory.id);
-      let updateData: Partial<Story> & { updatedAt: Date } = {
+      const updateData: Partial<Story> & { updatedAt: Date } = {
         title: state.editingStory.title.trim(),
         content: state.editingStory.content.trim(),
         tags: state.tags,
@@ -387,7 +388,15 @@ export default function EditFeatureStory() {
               <label htmlFor="image" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Image</label>
               {state.editingStory.imageUrl && !state.removedImage && (
                 <div className="mb-2">
-                  <img src={state.editingStory.imageUrl} alt="Current" className="w-32 h-32 object-cover rounded" />
+                  <div className="relative w-32 h-32">
+                    <Image
+                      src={state.editingStory.imageUrl}
+                      alt="Current feature story image"
+                      fill
+                      className="object-cover rounded"
+                      sizes="128px"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={handleRemoveImage}

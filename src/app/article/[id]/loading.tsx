@@ -1,5 +1,3 @@
-import { FaSpinner } from "react-icons/fa";
-
 export default function ArticleLoading() {
   return (
     <div className="min-h-screen bg-[#90d2dc] dark:bg-gray-900">

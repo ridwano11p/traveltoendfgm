@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
@@ -28,15 +28,7 @@ export default function CreateContactInfo() {
 
   const isDarkMode = themeContext?.theme === "dark";
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    checkExistingContactInfo();
-  }, [user, router]);
-
-  const checkExistingContactInfo = async () => {
+  const checkExistingContactInfo = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'siteContactInfo'));
       if (!querySnapshot.empty) {
@@ -47,7 +39,15 @@ export default function CreateContactInfo() {
       console.error('Error checking existing contact info:', err);
       setError('Failed to check existing contact information.');
     }
-  };
+  }, [router, setError]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    checkExistingContactInfo();
+  }, [user, router, checkExistingContactInfo]);
 
   const validateForm = (): boolean => {
     const { email, phone, location } = formData;

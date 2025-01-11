@@ -83,7 +83,7 @@ export default function CreateTeamMember() {
     try {
       new URL(url);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };

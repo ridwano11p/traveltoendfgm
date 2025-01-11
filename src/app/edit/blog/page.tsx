@@ -6,8 +6,9 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject, listAll } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject, listAll, StorageReference } from 'firebase/storage';
 import { FaSpinner, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface Blog {
   id: string;
@@ -236,7 +237,7 @@ export default function EditBlog() {
 
     try {
       const blogRef = doc(db, 'blogs', state.editingBlog.id);
-      let updateData: Partial<Blog> & { updatedAt: Date } = {
+      const updateData: Partial<Blog> & { updatedAt: Date } = {
         title: state.editingBlog.title.trim(),
         content: state.editingBlog.content.trim(),
         author: state.editingBlog.author.trim(),
@@ -330,7 +331,7 @@ export default function EditBlog() {
           const imagesFolderRef = ref(storage, 'blog_images');
           const videosFolderRef = ref(storage, 'blog_videos');
 
-          const deleteFolder = async (folderRef: any) => {
+          const deleteFolder = async (folderRef: StorageReference) => {
             const listResult = await listAll(folderRef);
             const deletePromises = listResult.items.map(item => deleteObject(item));
             await Promise.all(deletePromises);
@@ -424,7 +425,15 @@ export default function EditBlog() {
               <label htmlFor="image" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Image</label>
               {state.editingBlog.imageUrl && !state.removedImage && (
                 <div className="mb-2">
-                  <img src={state.editingBlog.imageUrl} alt="Current" className="w-32 h-32 object-cover rounded" />
+                  <div className="relative w-32 h-32">
+                    <Image
+                      src={state.editingBlog.imageUrl}
+                      alt="Current blog image"
+                      fill
+                      className="object-cover rounded"
+                      sizes="128px"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={handleRemoveImage}

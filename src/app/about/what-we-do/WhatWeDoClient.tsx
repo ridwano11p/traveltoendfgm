@@ -2,7 +2,6 @@
 
 import { useTheme } from "@/context/ThemeContext";
 import Image from "next/image";
-import { FaSpinner } from "react-icons/fa";
 
 interface WhatWeDoContent {
   mission: string;
