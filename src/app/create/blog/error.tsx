@@ -1,52 +1,49 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useTheme } from "@/context/ThemeContext";
+import { FaExclamationTriangle } from "react-icons/fa";
 
-interface ErrorProps {
+export default function Error({
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-}
-
-export default function CreateBlogError({ error, reset }: ErrorProps) {
-  const router = useRouter();
-  
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error("Blog creation error:", error);
-  }, [error]);
+}) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
-    <div className="min-h-screen py-12 bg-gray-50">
-      <div className="max-w-xl mx-auto px-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Error Creating Blog Post
+    <div className={`min-h-screen flex items-center justify-center p-4 ${
+      isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'
+    }`}>
+      <div className={`max-w-md w-full p-6 rounded-lg shadow-xl ${
+        isDark ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className="text-center mb-6">
+          <FaExclamationTriangle className={`text-5xl mb-4 ${
+            isDark ? 'text-red-400' : 'text-red-600'
+          }`} />
+          <h2 className={`text-2xl font-bold mb-2 ${
+            isDark ? 'text-white' : 'text-gray-800'
+          }`}>
+            Error Loading Blog Creation
           </h2>
-          <p className="text-gray-600 mb-8">
-            We encountered an error while trying to create your blog post. Please try again or return to the dashboard.
+          <p className={`mb-6 ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          }`}>
+            {error.message || "Failed to load the blog creation form. Please try again."}
           </p>
-          <div className="space-x-4">
-            <button
-              onClick={reset}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Try again
-            </button>
-            <button
-              onClick={() => router.push('/create')}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Return to Dashboard
-            </button>
-          </div>
-          {error.message && (
-            <div className="mt-6 p-4 bg-red-50 rounded-md">
-              <p className="text-sm text-red-700">
-                Error details: {error.message}
-              </p>
-            </div>
-          )}
+          <button
+            onClick={reset}
+            className={`px-6 py-3 rounded-md transition-colors ${
+              isDark
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            Try again
+          </button>
         </div>
       </div>
     </div>

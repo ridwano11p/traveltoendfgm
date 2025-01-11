@@ -7,25 +7,14 @@ import { db, storage } from '@/lib/firebase/config';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FaSpinner, FaTimes } from 'react-icons/fa';
+import { BlogFormData, FormState } from './types';
 
-interface FeatureStoryFormData {
-  title: string;
-  content: string;
-  author: string;
-  image: File | null;
-  video: File | null;
-  isYouTubeVideo: boolean;
-  youTubeUrl: string;
-  tags: string[];
-  currentTag: string;
-}
-
-export default function CreateFeatureStory() {
+export default function CreateBlogClient() {
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const router = useRouter();
+  const isDark = theme === 'dark';
 
-  const [formData, setFormData] = useState<FeatureStoryFormData>({
+  const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     content: '',
     author: '',
@@ -34,32 +23,20 @@ export default function CreateFeatureStory() {
     isYouTubeVideo: false,
     youTubeUrl: '',
     tags: [],
-    currentTag: ''
+    currentTag: '',
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, setState] = useState<FormState>({
+    loading: false,
+    error: null,
+  });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, image: file }));
-    }
-  };
-
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, video: file }));
-    }
-  };
-
-  const validateYouTubeUrl = (url: string): boolean => {
+  const validateYouTubeUrl = (url: string) => {
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=)?([a-zA-Z0-9_-]{11})$/;
     return youtubeRegex.test(url);
   };
 
-  const extractYoutubeId = (url: string): string | null => {
+  const extractYoutubeId = (url: string) => {
     const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/);
     return match ? match[1] : null;
   };
@@ -70,7 +47,7 @@ export default function CreateFeatureStory() {
       setFormData(prev => ({
         ...prev,
         tags: [...prev.tags, prev.currentTag.trim()],
-        currentTag: ''
+        currentTag: '',
       }));
     }
   };
@@ -78,39 +55,40 @@ export default function CreateFeatureStory() {
   const handleRemoveTag = (tagToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter(tag => tag !== tagToRemove),
     }));
+  };
+
+  const validateForm = (): boolean => {
+    if (formData.title.trim().length < 5) {
+      setState(prev => ({ ...prev, error: "Title must be at least 5 characters long." }));
+      return false;
+    }
+
+    if (formData.content.trim().length < 50) {
+      setState(prev => ({ ...prev, error: "Content must be at least 50 characters long." }));
+      return false;
+    }
+
+    if (formData.author.trim().length < 2) {
+      setState(prev => ({ ...prev, error: "Author name must be at least 2 characters long." }));
+      return false;
+    }
+
+    if (formData.isYouTubeVideo && !validateYouTubeUrl(formData.youTubeUrl)) {
+      setState(prev => ({ ...prev, error: "Please enter a valid YouTube URL." }));
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setState({ loading: true, error: null });
 
-    const { title, content, author, image, video, isYouTubeVideo, youTubeUrl, tags } = formData;
-
-    // Form validation
-    if (title.trim().length < 5) {
-      setError("Title must be at least 5 characters long.");
-      setLoading(false);
-      return;
-    }
-
-    if (content.trim().length < 50) {
-      setError("Content must be at least 50 characters long.");
-      setLoading(false);
-      return;
-    }
-
-    if (author.trim().length < 2) {
-      setError("Author name must be at least 2 characters long.");
-      setLoading(false);
-      return;
-    }
-
-    if (isYouTubeVideo && !validateYouTubeUrl(youTubeUrl)) {
-      setError("Please enter a valid YouTube URL.");
-      setLoading(false);
+    if (!validateForm()) {
+      setState(prev => ({ ...prev, loading: false }));
       return;
     }
 
@@ -119,41 +97,39 @@ export default function CreateFeatureStory() {
       let videoUrl = null;
       let youtubeId = null;
 
-      if (image) {
-        const imageRef = ref(storage, `feature_story_images/${Date.now()}_${image.name}`);
-        await uploadBytes(imageRef, image);
+      if (formData.image) {
+        const imageRef = ref(storage, `blog_images/${Date.now()}_${formData.image.name}`);
+        await uploadBytes(imageRef, formData.image);
         imageUrl = await getDownloadURL(imageRef);
       }
 
-      if (isYouTubeVideo) {
-        youtubeId = extractYoutubeId(youTubeUrl);
-        videoUrl = youTubeUrl;
-      } else if (video) {
-        const videoRef = ref(storage, `feature_story_videos/${Date.now()}_${video.name}`);
-        await uploadBytes(videoRef, video);
+      if (formData.isYouTubeVideo) {
+        youtubeId = extractYoutubeId(formData.youTubeUrl);
+        videoUrl = formData.youTubeUrl;
+      } else if (formData.video) {
+        const videoRef = ref(storage, `blog_videos/${Date.now()}_${formData.video.name}`);
+        await uploadBytes(videoRef, formData.video);
         videoUrl = await getDownloadURL(videoRef);
       }
 
-      const featureStoryData = {
-        title: title.trim(),
-        content: content.trim(),
-        author: author.trim(),
+      const blogData = {
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        author: formData.author.trim(),
         imageUrl,
         videoUrl,
         youtubeId,
-        isYouTubeVideo,
-        tags,
+        isYouTubeVideo: formData.isYouTubeVideo,
+        tags: formData.tags,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      await addDoc(collection(db, 'featureStories'), featureStoryData);
-      router.push('/');
+      await addDoc(collection(db, 'blogs'), blogData);
+      router.push('/impact-stories');
     } catch (err) {
-      console.error("Error creating feature story: ", err);
-      setError("Failed to create feature story. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error("Error creating blog post: ", err);
+      setState({ loading: false, error: "Failed to create blog post. Please try again." });
     }
   };
 
@@ -161,11 +137,14 @@ export default function CreateFeatureStory() {
     <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-4xl mx-auto px-4">
         <h1 className={`text-4xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          Create New Feature Story
+          Create New Blog Post
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title Input */}
           <div>
-            <label htmlFor="title" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Title</label>
+            <label htmlFor="title" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              Title
+            </label>
             <input
               type="text"
               id="title"
@@ -178,8 +157,12 @@ export default function CreateFeatureStory() {
               }`}
             />
           </div>
+
+          {/* Author Input */}
           <div>
-            <label htmlFor="author" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Author</label>
+            <label htmlFor="author" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              Author
+            </label>
             <input
               type="text"
               id="author"
@@ -192,8 +175,12 @@ export default function CreateFeatureStory() {
               }`}
             />
           </div>
+
+          {/* Content Input */}
           <div>
-            <label htmlFor="content" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Content</label>
+            <label htmlFor="content" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              Content
+            </label>
             <textarea
               id="content"
               value={formData.content}
@@ -206,18 +193,27 @@ export default function CreateFeatureStory() {
               }`}
             />
           </div>
+
+          {/* Image Input */}
           <div>
-            <label htmlFor="image" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Image</label>
+            <label htmlFor="image" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              Image
+            </label>
             <input
               type="file"
               id="image"
-              onChange={handleImageChange}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                image: e.target.files ? e.target.files[0] : null
+              }))}
               accept="image/*"
               className={`w-full px-3 py-2 border rounded-md ${
                 isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
               }`}
             />
           </div>
+
+          {/* Video Input */}
           <div>
             <label className={`flex items-center mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
               <input
@@ -241,7 +237,10 @@ export default function CreateFeatureStory() {
             ) : (
               <input
                 type="file"
-                onChange={handleVideoChange}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  video: e.target.files ? e.target.files[0] : null
+                }))}
                 accept="video/*"
                 className={`w-full px-3 py-2 border rounded-md ${
                   isDark ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
@@ -249,8 +248,12 @@ export default function CreateFeatureStory() {
               />
             )}
           </div>
+
+          {/* Tags Input */}
           <div>
-            <label htmlFor="tags" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Tags</label>
+            <label htmlFor="tags" className={`block mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              Tags
+            </label>
             <div className="flex flex-wrap mb-2">
               {formData.tags.map((tag, index) => (
                 <span
@@ -291,25 +294,28 @@ export default function CreateFeatureStory() {
               </button>
             </div>
           </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={state.loading}
             className={`w-full px-4 py-2 rounded-md ${
               isDark
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
-            } transition duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            } transition duration-300 ${state.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {loading ? (
+            {state.loading ? (
               <FaSpinner className="animate-spin mx-auto" />
             ) : (
-              'Create Feature Story'
+              'Create Blog Post'
             )}
           </button>
         </form>
-        {error && (
+
+        {state.error && (
           <div className={`mt-4 p-4 rounded-md ${isDark ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
-            {error}
+            {state.error}
           </div>
         )}
       </div>
