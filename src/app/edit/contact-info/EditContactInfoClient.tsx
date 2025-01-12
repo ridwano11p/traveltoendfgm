@@ -49,7 +49,7 @@ export default function EditContactInfoClient() {
       } else {
         router.push('/create/contact-info');
       }
-    } catch (_error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: 'Failed to load contact information. Please try again.'
@@ -101,7 +101,7 @@ export default function EditContactInfoClient() {
         updatedAt: new Date(),
       });
       router.push('/');
-    } catch (_error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: 'An error occurred while updating contact information. Please try again.'

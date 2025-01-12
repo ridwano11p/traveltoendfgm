@@ -206,7 +206,7 @@ export default function EditFeatureStoryClient() {
 
     try {
       const storyRef = doc(db, 'featureStories', state.editingStory.id);
-      let updateData: UpdateFeatureStoryData = {
+      const updateData: UpdateFeatureStoryData = {
         title: state.editingStory.title.trim(),
         content: state.editingStory.content.trim(),
         tags: state.tags,

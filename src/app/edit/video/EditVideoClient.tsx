@@ -27,11 +27,10 @@ export default function EditVideoClient() {
       const q = query(collection(db, 'videos'));
       const querySnapshot = await getDocs(q);
       const fetchedVideos = querySnapshot.docs.map(doc => {
-        const data = doc.data() as FirestoreVideo;
-        const { id: _id, ...restData } = data;
+        const data = doc.data() as Omit<FirestoreVideo, 'id'>;
         return {
+          ...data,
           id: doc.id,
-          ...restData,
           createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
           updatedAt: data.updatedAt ? new Date(data.updatedAt.seconds * 1000) : new Date(),
         };

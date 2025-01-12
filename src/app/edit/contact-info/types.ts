@@ -35,10 +35,10 @@ export interface ContactInfo {
   }
   
   // API Response Types
-  export interface ApiResponse {
+  export interface ApiResponse<T = ContactInfo> {
     success: boolean;
     error?: string;
-    data?: any;
+    data?: T;
   }
   
   // Form Validation Types

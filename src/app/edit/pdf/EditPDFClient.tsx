@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -12,18 +12,18 @@ import { PDF, EditingPDF, FormState } from './types';
 import PDFCard from './components/PDFCard';
 import EditForm from './components/EditForm';
 
-interface PDFUpdateData {
-  title: string;
-  description: string;
-  updatedAt: Date;
-  pdfUrl?: string;
-  fileName?: string;
-  storageFileName?: string;
+interface FirestoreTimestamp {
+  seconds: number;
+  nanoseconds: number;
 }
+
+type PDFUpdateData = Partial<Omit<PDF, 'id' | 'createdAt' | 'updatedAt'>> & {
+  updatedAt: FirestoreTimestamp;
+};
 
 export default function EditPDFClient() {
   const { theme } = useTheme();
-  const router = useRouter();
+
   const isDark = theme === 'dark';
 
   const [pdfs, setPdfs] = useState<PDF[]>([]);
@@ -102,7 +102,10 @@ export default function EditPDFClient() {
       let updateData: PDFUpdateData = {
         title: editingPdf.title.trim(),
         description: editingPdf.description.trim(),
-        updatedAt: new Date()
+        updatedAt: {
+          seconds: Math.floor(new Date().getTime() / 1000),
+          nanoseconds: 0
+        }
       };
 
       if (newPdfFile) {
@@ -124,7 +127,17 @@ export default function EditPDFClient() {
         };
       }
 
-      await updateDoc(pdfRef, updateData as any);
+      // Convert updatedAt to string format for the PDF interface
+      const now = new Date();
+      const updateDataWithTimestamp: PDFUpdateData = {
+        ...updateData,
+        updatedAt: {
+          seconds: Math.floor(now.getTime() / 1000),
+          nanoseconds: 0
+        }
+      };
+
+      await updateDoc(pdfRef, updateDataWithTimestamp);
       setEditingPdf(null);
       fetchPdfs();
     } catch (err) {

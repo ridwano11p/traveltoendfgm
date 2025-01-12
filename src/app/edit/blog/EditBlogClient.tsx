@@ -28,11 +28,6 @@ function validateYouTubeUrl(url: string): boolean {
   return regExp.test(url);
 }
 
-function extractYoutubeId(url: string): string | null {
-  const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : null;
-}
-
 export default function EditBlogClient() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -81,7 +76,18 @@ export default function EditBlogClient() {
 
     try {
       const blogRef = doc(db, 'blogs', state.editingBlog.id);
-      const updateData: Record<string, any> = {
+      type BlogUpdateData = Partial<{
+        title: string;
+        content: string;
+        author: string;
+        imageUrl: string | null;
+        videoUrl: string | null;
+        isYouTubeVideo: boolean;
+        tags: string[];
+        updatedAt: Date;
+      }>;
+      
+      const updateData: BlogUpdateData = {
         title: state.editingBlog.title.trim(),
         content: state.editingBlog.content.trim(),
         author: state.editingBlog.author.trim(),

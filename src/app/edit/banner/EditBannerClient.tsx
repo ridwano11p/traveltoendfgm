@@ -91,7 +91,9 @@ export default function EditBannerClient() {
 
     try {
       const bannerRef = doc(db, 'banners', state.editingBanner.id);
-      const updateData: Record<string, any> = {
+      type BannerUpdateData = Partial<Omit<Banner, 'id'>>;
+      
+      const updateData: BannerUpdateData = {
         title: state.editingBanner.title.trim(),
         description: state.editingBanner.description.trim(),
         updatedAt: new Date()

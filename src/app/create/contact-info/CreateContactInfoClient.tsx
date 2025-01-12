@@ -25,20 +25,20 @@ export default function CreateContactInfoClient() {
   });
 
   useEffect(() => {
-    checkExistingContactInfo();
-  }, []);
-
-  const checkExistingContactInfo = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'siteContactInfo'));
-      if (!querySnapshot.empty) {
-        alert('Contact information already exists. Please use the edit page to update it.');
-        router.push('/edit');
+    const checkExistingContactInfo = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'siteContactInfo'));
+        if (!querySnapshot.empty) {
+          alert('Contact information already exists. Please use the edit page to update it.');
+          router.push('/edit');
+        }
+      } catch (error) {
+        console.error('Error checking existing contact info:', error);
       }
-    } catch (error) {
-      console.error('Error checking existing contact info:', error);
-    }
-  };
+    };
+
+    checkExistingContactInfo();
+  }, [router]);
 
   const validateForm = (): boolean => {
     if (!formData.email.trim()) {
