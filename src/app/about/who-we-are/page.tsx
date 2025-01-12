@@ -73,10 +73,8 @@ async function getTeamMembers(searchTerm?: string | null) {
 }
 
 export default async function WhoWeArePage({
-  params,
   searchParams,
 }: {
-  params: Record<string, string>;
   searchParams: { q?: string };
 }) {
   const searchQuery = searchParams.q;
