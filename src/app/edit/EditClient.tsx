@@ -25,7 +25,7 @@ const editOptions: EditOptionData[] = [
   {
     title: "Edit Videos",
     description: "Update or remove videos from the Documentaries section.",
-    link: "/edit/videos"
+    link: "/edit/video"
   },
   {
     title: "Edit 'What We Do' Info",
