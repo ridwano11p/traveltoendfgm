@@ -1,10 +1,10 @@
 "use client";
 
 import { useReducer, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { Banner } from './types';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { FaSpinner } from 'react-icons/fa';
 import { bannerReducer, initialState } from './reducers';
@@ -23,7 +23,6 @@ function extractYoutubeId(url: string): string | null {
 
 export default function EditBannerClient() {
   const { theme } = useTheme();
-  const router = useRouter();
   const isDark = theme === 'dark';
   const [state, dispatch] = useReducer(bannerReducer, initialState);
 
@@ -36,10 +35,19 @@ export default function EditBannerClient() {
     try {
       const q = query(collection(db, 'banners'));
       const querySnapshot = await getDocs(q);
-      const fetchedBanners = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const fetchedBanners = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title || '',
+          description: data.description || '',
+          mediaUrl: data.mediaUrl || '',
+          mediaType: (data.mediaType as 'image' | 'video' | 'youtube') || 'image',
+          isYouTube: data.isYouTube || false,
+          youtubeId: data.youtubeId || null,
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        } as Banner;
+      });
       dispatch({ type: 'SET_BANNERS', payload: fetchedBanners });
     } catch (err) {
       console.error("Error fetching banners: ", err);
@@ -83,7 +91,7 @@ export default function EditBannerClient() {
 
     try {
       const bannerRef = doc(db, 'banners', state.editingBanner.id);
-      let updateData: any = {
+      const updateData: Record<string, any> = {
         title: state.editingBanner.title.trim(),
         description: state.editingBanner.description.trim(),
         updatedAt: new Date()

@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
@@ -93,7 +92,6 @@ function reducer(state: FeatureStoryState, action: FeatureStoryAction): FeatureS
 
 export default function EditFeatureStoryClient() {
   const { theme } = useTheme();
-  const router = useRouter();
   const isDark = theme === 'dark';
   const [state, dispatch] = useReducer(reducer, initialState);
 

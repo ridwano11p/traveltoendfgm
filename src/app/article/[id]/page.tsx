@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ...(article.imageUrl && { images: [article.imageUrl] }),
       }
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       title: 'Article',
       description: 'Read our latest articles and stories.'

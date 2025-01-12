@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { BannerCardProps } from '../types';
 import { FaEdit, FaTrash, FaImage, FaVideo, FaYoutube } from 'react-icons/fa';
 
@@ -13,9 +14,11 @@ export default function BannerCard({
     <div className={`p-6 rounded-lg shadow-md ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
       <div className="relative mb-4">
         {banner.mediaType === 'image' ? (
-          <img
+          <Image
             src={banner.mediaUrl}
             alt={banner.title}
+            width={800}
+            height={400}
             className="w-full h-48 object-cover rounded-md"
           />
         ) : banner.mediaType === 'video' ? (

@@ -37,7 +37,7 @@ export default function CreateTeamMemberClient() {
     try {
       new URL(url);
       return true;
-    } catch (e) {
+    } catch (_e) {
       return false;
     }
   };

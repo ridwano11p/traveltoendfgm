@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { Blog } from './types';
@@ -12,14 +11,12 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  writeBatch,
 } from 'firebase/firestore';
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-  listAll,
 } from 'firebase/storage';
 import { FaSpinner } from 'react-icons/fa';
 import { blogReducer, initialState } from './reducers';
@@ -38,7 +35,6 @@ function extractYoutubeId(url: string): string | null {
 
 export default function EditBlogClient() {
   const { theme } = useTheme();
-  const router = useRouter();
   const isDark = theme === 'dark';
   const [state, dispatch] = useReducer(blogReducer, initialState);
 
@@ -85,7 +81,7 @@ export default function EditBlogClient() {
 
     try {
       const blogRef = doc(db, 'blogs', state.editingBlog.id);
-      let updateData: any = {
+      const updateData: Record<string, any> = {
         title: state.editingBlog.title.trim(),
         content: state.editingBlog.content.trim(),
         author: state.editingBlog.author.trim(),

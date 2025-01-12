@@ -93,7 +93,7 @@ export default function CreateWhatWeDoClient() {
     <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-4xl mx-auto px-4">
         <h1 className={`text-4xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          Create 'What We Do' Information
+          Create &apos;What We Do&apos; Information
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <ContentInput
@@ -138,7 +138,7 @@ export default function CreateWhatWeDoClient() {
             {state.loading ? (
               <FaSpinner className="animate-spin mx-auto" />
             ) : (
-              "Create 'What We Do' Information"
+              "Create &apos;What We Do&apos; Information"
             )}
           </button>
         </form>

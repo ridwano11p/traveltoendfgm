@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -15,7 +14,6 @@ import VideoCard from './components/VideoCard';
 
 export default function EditVideoClient() {
   const { theme } = useTheme();
-  const router = useRouter();
   const isDark = theme === 'dark';
   const [state, dispatch] = useReducer(videoReducer, initialState);
 
@@ -30,7 +28,7 @@ export default function EditVideoClient() {
       const querySnapshot = await getDocs(q);
       const fetchedVideos = querySnapshot.docs.map(doc => {
         const data = doc.data() as FirestoreVideo;
-        const { id: _, ...restData } = data;
+        const { id: _id, ...restData } = data;
         return {
           id: doc.id,
           ...restData,

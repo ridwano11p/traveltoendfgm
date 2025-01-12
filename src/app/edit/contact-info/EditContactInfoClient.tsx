@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db } from '@/lib/firebase/config';
@@ -28,11 +28,7 @@ export default function EditContactInfoClient() {
     docId: '',
   });
 
-  useEffect(() => {
-    fetchContactInfo();
-  }, []);
-
-  const fetchContactInfo = async () => {
+  const fetchContactInfo = useCallback(async () => {
     try {
       const q = query(
         collection(db, 'siteContactInfo'),
@@ -53,7 +49,7 @@ export default function EditContactInfoClient() {
       } else {
         router.push('/create/contact-info');
       }
-    } catch (error) {
+    } catch (_error) {
       setState(prev => ({
         ...prev,
         error: 'Failed to load contact information. Please try again.'
@@ -61,7 +57,11 @@ export default function EditContactInfoClient() {
     } finally {
       setState(prev => ({ ...prev, loading: false }));
     }
-  };
+  }, [router, setFormData, setState]);
+
+  useEffect(() => {
+    void fetchContactInfo();
+  }, [fetchContactInfo]);
 
   const validateForm = (): boolean => {
     if (!formData.email.trim()) {
@@ -101,7 +101,7 @@ export default function EditContactInfoClient() {
         updatedAt: new Date(),
       });
       router.push('/');
-    } catch (error) {
+    } catch (_error) {
       setState(prev => ({
         ...prev,
         error: 'An error occurred while updating contact information. Please try again.'

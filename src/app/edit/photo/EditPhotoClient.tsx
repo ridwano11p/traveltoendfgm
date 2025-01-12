@@ -1,19 +1,26 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { db, storage } from '@/lib/firebase/config';
-import { collection, query, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject, listAll } from 'firebase/storage';
+import { 
+  collection, 
+  query, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  Timestamp,
+  FieldValue 
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { FaSpinner } from 'react-icons/fa';
-import { Photo, EditingPhoto, PhotoState } from './types';
+import { Photo, PhotoState } from './types';
 import PhotoList from './components/PhotoList';
 import EditPhotoForm from './components/EditPhotoForm';
 
 export default function EditPhotoClient() {
   const { theme } = useTheme();
-  const router = useRouter();
   const isDark = theme === 'dark';
 
   const [state, setState] = useState<PhotoState>({
@@ -124,8 +131,18 @@ export default function EditPhotoClient() {
         updateData.photoUrl = await getDownloadURL(imageRef);
       }
 
-      // Convert UpdatePhotoData to a plain object for Firebase
-      await updateDoc(photoRef, {...updateData} as { [x: string]: any });
+      // Convert data to Firestore format
+      const firestoreData: { [key: string]: string | null | Timestamp | FieldValue } = {
+        title: updateData.title,
+        description: updateData.description,
+        updatedAt: Timestamp.fromDate(updateData.updatedAt)
+      };
+
+      if (updateData.photoUrl !== undefined) {
+        firestoreData.photoUrl = updateData.photoUrl;
+      }
+
+      await updateDoc(photoRef, firestoreData);
 
       if ((state.removedImage || state.newImage) && state.editingPhoto.photoUrl) {
         try {
@@ -170,6 +187,7 @@ export default function EditPhotoClient() {
       const photosSnapshot = await getDocs(collection(db, 'photos'));
       if (photosSnapshot.empty) {
         const folderRef = ref(storage, 'photos');
+        const { listAll } = await import('firebase/storage');
         const listResult = await listAll(folderRef);
         await Promise.all(listResult.items.map(item => deleteObject(item)));
       }

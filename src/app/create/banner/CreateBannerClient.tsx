@@ -77,7 +77,7 @@ export default function CreateBannerClient() {
 
     try {
       let mediaUrl = formData.youtubeUrl;
-      let mediaType = formData.isLocalMedia ?
+      const mediaType = formData.isLocalMedia ?
         (formData.mediaFile?.type.startsWith('image/') ? 'image' : 'video') :
         'youtube';
 

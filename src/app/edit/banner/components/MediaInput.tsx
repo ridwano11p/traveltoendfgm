@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { MediaInputProps } from '../types';
 
 export default function MediaInput({
@@ -61,9 +62,11 @@ export default function MediaInput({
                 Current Media
               </label>
               {currentMedia.type === 'image' ? (
-                <img
+                <Image
                   src={currentMedia.url}
                   alt="Current Banner"
+                  width={600}
+                  height={400}
                   className="max-w-full h-auto rounded-md"
                 />
               ) : (

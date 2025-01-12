@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { FaTimes } from 'react-icons/fa';
 import { FeatureStoryFormProps } from '../types';
 import { validateYouTubeUrl, extractYoutubeId } from '../utils/youtubeHelpers';
@@ -99,10 +100,12 @@ export default function FeatureStoryForm({
         </label>
         {state.editingStory?.imageUrl && !state.removedImage && (
           <div className="mb-2">
-            <img
+            <Image
               src={state.editingStory.imageUrl}
               alt="Current"
-              className="w-32 h-32 object-cover rounded"
+              width={128}
+              height={128}
+              className="object-cover rounded"
             />
             <button
               type="button"
