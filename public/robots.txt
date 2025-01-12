@@ -3,7 +3,7 @@ User-agent: *
 
 # Allow access to public pages
 Allow: /
-Allow: /search-page
+Allow: /home
 Allow: /impact-stories
 Allow: /about/who-we-are
 Allow: /about/what-we-do
@@ -11,6 +11,9 @@ Allow: /documentaries/videos
 Allow: /research/pdfs
 Allow: /gallery/photos
 Allow: /contact
+Allow: /tag
+Allow: /article
+Allow: /search
 
 # Disallow admin and creation pages
 Disallow: /create/
