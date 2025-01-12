@@ -4,6 +4,12 @@ import { TeamMember } from './types';
 import WhoWeAreClient from './WhoWeAreClient';
 import { Metadata } from 'next';
 
+// Update the Props interface to include all required Next.js page props
+type Props = {
+  params: { [key: string]: string | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 export const metadata: Metadata = {
   title: 'Who We Are | Travel to End FGM',
   description: 'Meet our dedicated team working to end FGM through education and advocacy.',
@@ -49,11 +55,8 @@ async function getTeamMembers(searchTerm?: string) {
   }
 }
 
-export default async function WhoWeArePage({
-  searchParams,
-}: {
-  searchParams: { q?: string }
-}) {
-  const teamMembers = await getTeamMembers(searchParams.q);
+export default async function WhoWeArePage({ searchParams }: Props) {
+  const searchQuery = typeof searchParams.q === 'string' ? searchParams.q : undefined;
+  const teamMembers = await getTeamMembers(searchQuery);
   return <WhoWeAreClient teamMembers={teamMembers} />;
 }
