@@ -10,7 +10,6 @@ export default function VideoForm({
   isLocalVideo,
   tempYoutubeUrl,
   newVideoFile,
-  newThumbnail,
   isDark,
   onUpdate,
   onCancel,

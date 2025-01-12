@@ -1,6 +1,6 @@
 "use client";
 
-import { FaExpand, FaSpinner } from 'react-icons/fa';
+import { FaExpand } from 'react-icons/fa';
 import Image from 'next/image';
 import { Photo } from '../types';
 

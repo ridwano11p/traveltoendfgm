@@ -9,7 +9,8 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { FaSpinner } from 'react-icons/fa';
 import {
   WhatWeDoContent,
-  FormState
+  FormState,
+  WhatWeDoUpdateData
 } from './types';
 import ContentEditor from './components/ContentEditor';
 import ImageEditor from './components/ImageEditor';
@@ -90,8 +91,7 @@ export default function EditWhatWeDoClient() {
     try {
       const docRef = doc(db, 'about', 'what_we_do');
 
-      // Create the base update data
-      const baseUpdateData = {
+      const baseUpdateData: WhatWeDoUpdateData = {
         mission: content.mission.trim(),
         approach: content.approach.trim(),
         impact: content.impact.trim(),
@@ -105,7 +105,6 @@ export default function EditWhatWeDoClient() {
         await uploadBytes(imageRef, newImage);
         imageUrl = await getDownloadURL(imageRef);
 
-        // Delete old image if it exists
         if (content.imageUrl) {
           try {
             const oldImageRef = ref(storage, content.imageUrl);
@@ -116,11 +115,10 @@ export default function EditWhatWeDoClient() {
         }
       }
 
-      // Use type assertion for Firestore update
       await updateDoc(docRef, {
         ...baseUpdateData,
         ...(imageUrl ? { imageUrl } : {})
-      } as { [key: string]: any });
+      });
 
       router.push('/about/what-we-do');
     } catch (err) {

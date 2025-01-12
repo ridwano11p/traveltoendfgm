@@ -4,7 +4,6 @@ import "./globals.css";
 import Providers from "./providers/Providers";
 import NavBar from "@/components/shared/NavBar";
 import Footer from "@/components/shared/footer/Footer";
-import sitelogo from "@/assets/images/sitelogo.png";
 
 const inter = Inter({ subsets: ["latin"] });
 

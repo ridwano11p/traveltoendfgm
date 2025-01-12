@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/config";
-import { collection, getDocs, DocumentData } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import PDFClient from "./PDFClient";
 import { PDF } from "./types";
 

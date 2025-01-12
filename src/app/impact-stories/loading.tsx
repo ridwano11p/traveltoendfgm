@@ -1,5 +1,3 @@
-import { FaSpinner } from "react-icons/fa";
-
 export default function ImpactStoriesLoading() {
   return (
     <div className="min-h-screen py-12 bg-[#90d2dc] dark:bg-gray-900">
@@ -16,10 +14,10 @@ export default function ImpactStoriesLoading() {
             <div className="p-6">
               {/* Title Skeleton */}
               <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-2 mx-auto animate-pulse" />
-              
+
               {/* Author Skeleton */}
               <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2 mx-auto animate-pulse" />
-              
+
               {/* Date Skeleton */}
               <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-4 mx-auto animate-pulse" />
 

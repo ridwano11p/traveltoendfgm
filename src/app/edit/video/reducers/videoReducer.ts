@@ -1,4 +1,4 @@
-import { EditVideoState, EditVideoAction, Video } from '../types';
+import { EditVideoState, EditVideoAction } from '../types';
 
 export const initialState: EditVideoState = {
   videos: [],

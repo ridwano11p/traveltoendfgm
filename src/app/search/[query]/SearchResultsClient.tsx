@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
-import { FaSpinner } from 'react-icons/fa';
 import {
   SearchResult,
   BlogSearchResult,

@@ -7,29 +7,11 @@ const protectedPaths = [
   "/edit",
 ];
 
-// List of public paths that don't require authentication
-const publicPaths = [
-  "/login",
-  "/",
-  "/about",
-  "/impact-stories",
-  "/documentaries",
-  "/research",
-  "/gallery",
-  "/contact",
-  "/search-page",
-];
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if the path is protected
-  const isProtectedPath = protectedPaths.some(path => 
-    pathname.startsWith(path)
-  );
-
-  // Check if the path is public
-  const isPublicPath = publicPaths.some(path => 
+  const isProtectedPath = protectedPaths.some(path =>
     pathname.startsWith(path)
   );
 
@@ -58,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
   // For all other cases, allow the request to continue
   const response = NextResponse.next();
-  
+
   // Add security headers
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");

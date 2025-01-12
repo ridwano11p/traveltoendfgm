@@ -1,4 +1,5 @@
 import { ThumbnailGenerationOptions, YouTubeValidation } from '../types';
+import { FirebaseStorage, ref, deleteObject } from 'firebase/storage';
 
 export function validateYouTubeUrl(url: string): YouTubeValidation {
   const regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})$/;
@@ -66,18 +67,18 @@ export async function generateThumbnail(
 export async function cleanupStorageFiles(
   videoUrl: string | null,
   thumbnailUrl: string | null,
-  storage: any
+  storage: FirebaseStorage
 ): Promise<void> {
   const deletePromises: Promise<void>[] = [];
 
   if (videoUrl) {
-    const videoRef = storage.ref(videoUrl);
-    deletePromises.push(videoRef.delete());
+    const videoRef = ref(storage, videoUrl);
+    deletePromises.push(deleteObject(videoRef));
   }
 
   if (thumbnailUrl) {
-    const thumbnailRef = storage.ref(thumbnailUrl);
-    deletePromises.push(thumbnailRef.delete());
+    const thumbnailRef = ref(storage, thumbnailUrl);
+    deletePromises.push(deleteObject(thumbnailRef));
   }
 
   await Promise.all(deletePromises);

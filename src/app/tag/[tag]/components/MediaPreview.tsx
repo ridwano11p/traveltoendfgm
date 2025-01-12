@@ -4,7 +4,7 @@ import { MediaPreviewProps } from '../types';
 import { FaPlayCircle } from 'react-icons/fa';
 import Image from 'next/image';
 
-export default function MediaPreview({ post, isDark }: MediaPreviewProps) {
+export default function MediaPreview({ post }: MediaPreviewProps) {
   const hasImage = post.imageUrl && post.imageUrl.trim() !== '';
   const hasVideo = post.videoUrl && post.videoUrl.trim() !== '';
 

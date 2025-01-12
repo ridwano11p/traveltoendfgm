@@ -4,18 +4,6 @@ import { db } from "@/lib/firebase/config";
 import ImpactStoriesClient from "./ImpactStoriesClient";
 import { redirect } from "next/navigation";
 
-interface BlogPost {
-  id: string;
-  title: string;
-  content: string;
-  author?: string;
-  date?: string;
-  imageUrl?: string;
-  videoUrl?: string;
-  isYouTubeVideo?: boolean;
-  tags?: string[];
-}
-
 type Props = {
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
