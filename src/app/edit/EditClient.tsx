@@ -41,7 +41,7 @@ const editOptions: EditOptionData[] = [
   {
     title: "Edit Photos",
     description: "Update or remove photos from the Gallery section.",
-    link: "/edit/photos"
+    link: "/edit/photo"
   },
   {
     title: "Edit Contact Info",
