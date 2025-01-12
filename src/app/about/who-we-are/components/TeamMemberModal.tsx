@@ -1,50 +1,9 @@
 "use client";
 
+import { TeamMemberModalProps } from '../types';
 import { FaLinkedin, FaFacebook, FaYoutube, FaTwitter } from 'react-icons/fa';
 import Image from 'next/image';
-
-interface SocialMediaButtonProps {
-  icon: React.ReactNode;
-  link: string | undefined;
-  isDark: boolean;
-}
-
-const SocialMediaButton = ({ icon, link, isDark }: SocialMediaButtonProps) => {
-  if (!link) return null;
-
-  return (
-    <a
-      href={link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`flex items-center justify-center w-10 h-10 rounded-full ${
-        isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-      } transition duration-300`}
-    >
-      {icon}
-    </a>
-  );
-};
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  bio: string;
-  imageUrl: string;
-  linkedin?: string;
-  facebook?: string;
-  youtube?: string;
-  twitter?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface TeamMemberModalProps {
-  member: TeamMember;
-  isDark: boolean;
-  onClose: () => void;
-}
+import SocialMediaButton from './SocialMediaButton';
 
 export default function TeamMemberModal({ member, isDark, onClose }: TeamMemberModalProps) {
   const socialMediaLinks = [
@@ -56,10 +15,14 @@ export default function TeamMemberModal({ member, isDark, onClose }: TeamMemberM
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className={`relative max-w-2xl w-full rounded-lg shadow-lg ${isDark ? 'bg-gray-800' : 'bg-[#90d2dc]'} p-6 m-4 max-h-[90vh] overflow-y-auto`}>
+      <div className={`relative max-w-2xl w-full rounded-lg shadow-lg ${
+        isDark ? 'bg-gray-800' : 'bg-[#90d2dc]'
+      } p-6 m-4 max-h-[90vh] overflow-y-auto`}>
         <button
           onClick={onClose}
-          className={`sticky top-0 float-right text-2xl ${isDark ? 'text-gray-300' : 'text-gray-600'} hover:text-gray-500 z-10`}
+          className={`sticky top-0 float-right text-2xl ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          } hover:text-gray-500 z-10`}
         >
           ×
         </button>
@@ -76,20 +39,21 @@ export default function TeamMemberModal({ member, isDark, onClose }: TeamMemberM
             </div>
           </div>
           <div className="md:w-2/3 md:pl-6">
-            <h2 className={`text-2xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <h2 className={`text-2xl font-semibold mb-2 ${
+              isDark ? 'text-white' : 'text-gray-800'
+            }`}>
               {member.name}
             </h2>
-            <p className={`text-lg mb-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+            <p className={`text-lg mb-4 ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            }`}>
               {member.role}
             </p>
-            <div className={`mb-4 whitespace-pre-wrap ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className={`mb-4 whitespace-pre-wrap ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               {member.bio}
             </div>
-            {member.updatedAt && (
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Last updated: {new Date(member.updatedAt).toLocaleDateString()}
-              </p>
-            )}
           </div>
         </div>
         <div className="flex justify-end mt-4 space-x-2 sticky bottom-0 bg-inherit py-2">

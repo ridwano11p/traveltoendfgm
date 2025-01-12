@@ -1,15 +1,9 @@
 "use client";
 
+import { TeamMemberCardProps } from '../types';
 import Image from 'next/image';
-import { TeamMember as TeamMemberType } from './TeamMemberModal';
 
-interface TeamMemberProps {
-  member: TeamMemberType;
-  isDark: boolean;
-  onOpenModal: (member: TeamMemberType) => void;
-}
-
-export default function TeamMember({ member, isDark, onOpenModal }: TeamMemberProps) {
+export default function TeamMember({ member, isDark, onOpenModal }: TeamMemberCardProps) {
   const truncatedBio = member.bio.length > 100 ?
     member.bio.substring(0, 100) + '...' :
     member.bio;
@@ -25,13 +19,19 @@ export default function TeamMember({ member, isDark, onOpenModal }: TeamMemberPr
           sizes="128px"
         />
       </div>
-      <h3 className={`text-xl font-semibold mb-2 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
+      <h3 className={`text-xl font-semibold mb-2 text-center ${
+        isDark ? 'text-white' : 'text-gray-800'
+      }`}>
         {member.name}
       </h3>
-      <p className={`text-center mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+      <p className={`text-center mb-2 ${
+        isDark ? 'text-gray-300' : 'text-gray-600'
+      }`}>
         {member.role}
       </p>
-      <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
+      <p className={`text-sm mb-4 ${
+        isDark ? 'text-gray-400' : 'text-gray-700'
+      }`}>
         {truncatedBio}
       </p>
       <button
