@@ -46,10 +46,10 @@ export default function EditWhatWeDoClient() {
           updatedAt: data.updatedAt.toDate(),
         } as WhatWeDoContent);
       } else {
-        setState(prev => ({ ...prev, error: "No 'What We Do' content found." }));
+        setState(prev => ({ ...prev, error: "No ‘What We Do’ content found." }));
       }
     } catch (err) {
-      console.error("Error fetching 'What We Do' content: ", err);
+      console.error("Error fetching ‘What We Do’ content: ", err);
       setState(prev => ({ ...prev, error: "Failed to fetch content. Please try again." }));
     } finally {
       setState(prev => ({ ...prev, loading: false }));
@@ -122,7 +122,7 @@ export default function EditWhatWeDoClient() {
 
       router.push('/about/what-we-do');
     } catch (err) {
-      console.error("Error updating 'What We Do' content: ", err);
+      console.error("Error updating ‘What We Do’ content: ", err);
       setState({
         loading: false,
         error: "Failed to update content. Please try again."
@@ -150,7 +150,7 @@ export default function EditWhatWeDoClient() {
     <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-4xl mx-auto px-4">
         <h1 className={`text-4xl font-bold mb-8 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          Edit 'What We Do' Content
+          Edit ‘What We Do’ Content
         </h1>
         <form onSubmit={handleUpdate} className="space-y-6">
           <ContentEditor

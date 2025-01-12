@@ -128,7 +128,7 @@ export default function SearchResultsClient({ results, searchTerm, error }: Prop
     <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
       <div className="max-w-6xl mx-auto px-4">
         <h1 className={`text-3xl font-bold mb-8 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          Search Results for "{searchTerm}"
+          Search Results for “{searchTerm}”
         </h1>
 
         {results.length === 0 ? (

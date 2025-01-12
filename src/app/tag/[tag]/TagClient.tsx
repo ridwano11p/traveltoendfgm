@@ -13,7 +13,7 @@ export default function TagClient({ posts, tag }: TagClientProps) {
     <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-[#90d2dc] text-gray-900'}`}>
       <div className="max-w-6xl mx-auto px-4 py-12">
         <h1 className={`text-4xl font-bold mb-8 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          Posts tagged with "{tag}"
+          Posts tagged with “{tag}”
         </h1>
         {posts.length === 0 ? (
           <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
