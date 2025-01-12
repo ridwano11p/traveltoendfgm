@@ -2,6 +2,7 @@ import { db } from "@/lib/firebase/config";
 import { collection, getDocs, query, where, DocumentData } from "firebase/firestore";
 import WhoWeAreClient from "./WhoWeAreClient";
 import { TeamMember } from "./TeamMemberModal";
+import { useSearchParams } from 'next/navigation'; // Importing useSearchParams hook
 
 interface FirestoreTeamMember extends DocumentData {
   name: string;
@@ -16,6 +17,7 @@ interface FirestoreTeamMember extends DocumentData {
   updatedAt?: { seconds: number; nanoseconds: number };
 }
 
+// Fetch team members with optional search term
 async function getTeamMembers(searchTerm?: string | null) {
   try {
     let q;
@@ -72,12 +74,13 @@ async function getTeamMembers(searchTerm?: string | null) {
   }
 }
 
-export default async function WhoWeArePage({
-  searchParams,
-}: {
-  searchParams: { q?: string };
-}) {
-  const searchQuery = searchParams.q;
+// The main page component
+export default async function WhoWeArePage() {
+  const searchParams = useSearchParams(); // Using the hook to extract query params
+  const searchQuery = searchParams.get('q'); // Extract the `q` parameter from the URL
+
+  // Fetch team members based on the search query
   const members = await getTeamMembers(searchQuery);
+
   return <WhoWeAreClient teamMembers={members} />;
 }
