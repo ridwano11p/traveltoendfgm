@@ -3,6 +3,12 @@ import { collection, getDocs, query, where, DocumentData } from "firebase/firest
 import WhoWeAreClient from "./WhoWeAreClient";
 import { TeamMember } from "./TeamMemberModal";
 
+// Add this type for the page props
+type PageProps = {
+  params: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 interface FirestoreTeamMember extends DocumentData {
   name: string;
   role: string;
@@ -72,11 +78,7 @@ async function getTeamMembers(searchTerm?: string | null) {
   }
 }
 
-export default async function WhoWeArePage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function WhoWeArePage({ searchParams }: PageProps) {
   const searchQuery = typeof searchParams.q === 'string' ? searchParams.q : undefined;
   const members = await getTeamMembers(searchQuery);
   return <WhoWeAreClient teamMembers={members} />;
