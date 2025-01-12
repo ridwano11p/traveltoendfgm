@@ -4,10 +4,6 @@ import { TeamMember } from './types';
 import WhoWeAreClient from './WhoWeAreClient';
 import { Metadata } from 'next';
 
-interface Props {
-  searchParams: { q?: string };
-}
-
 export const metadata: Metadata = {
   title: 'Who We Are | Travel to End FGM',
   description: 'Meet our dedicated team working to end FGM through education and advocacy.',
@@ -53,8 +49,11 @@ async function getTeamMembers(searchTerm?: string) {
   }
 }
 
-// @ts-ignore -- Next.js page props type mismatch but working as expected locally
-export default async function WhoWeArePage({ searchParams }: Props) {
+export default async function WhoWeArePage({
+  searchParams,
+}: {
+  searchParams: { q?: string }
+}) {
   const teamMembers = await getTeamMembers(searchParams.q);
   return <WhoWeAreClient teamMembers={teamMembers} />;
 }
