@@ -36,7 +36,7 @@ const editOptions: EditOptionData[] = [
   {
     title: "Edit PDFs",
     description: "Update or remove PDFs from the Research and Reports section.",
-    link: "/edit/pdfs"
+    link: "/edit/pdf"
   },
   {
     title: "Edit Photos",
