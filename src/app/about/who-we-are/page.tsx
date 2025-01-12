@@ -72,12 +72,14 @@ async function getTeamMembers(searchTerm?: string | null) {
   }
 }
 
-interface Props {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default async function WhoWeArePage({ searchParams }: Props) {
-  const searchQuery = typeof searchParams.q === 'string' ? searchParams.q : undefined;
+export default async function WhoWeArePage({
+  params,
+  searchParams,
+}: {
+  params: Record<string, string>;
+  searchParams: { q?: string };
+}) {
+  const searchQuery = searchParams.q;
   const members = await getTeamMembers(searchQuery);
   return <WhoWeAreClient teamMembers={members} />;
 }
