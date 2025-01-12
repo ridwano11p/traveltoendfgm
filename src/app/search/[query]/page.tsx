@@ -1,11 +1,20 @@
 import { db } from "@/lib/firebase/config";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import SearchResultsClient from "./SearchResultsClient";
-import { SearchResult, SearchType } from "../types";
+import { SearchResult, SearchType, TeamMemberSearchResult } from "../types";
 
 interface Props {
   params: { query: string };
   searchParams: { type?: SearchType };
+}
+
+type SearchableItem = SearchResult & {
+  name?: string;
+  title?: string;
+};
+
+function isTeamMember(item: SearchResult): item is TeamMemberSearchResult {
+  return item.type === 'team_members';
 }
 
 async function getSearchResults(searchTerm: string, searchType: SearchType = 'all') {
@@ -43,21 +52,15 @@ async function getSearchResults(searchTerm: string, searchType: SearchType = 'al
 
     // Filter results based on search term
     allResults = allResults.filter(item => {
-      const searchField = item.type === 'team_members' ?
-        (item as any).name || '' :
-        (item as any).title || '';
+      const searchField = isTeamMember(item) ? item.name : (item as SearchableItem).title || '';
       const normalizedField = searchField.toLowerCase().replace(/\s+/g, ' ').trim();
       return normalizedField.includes(normalizedSearchTerm);
     });
 
     // Sort results by relevance
     allResults.sort((a, b) => {
-      const aField = a.type === 'team_members' ?
-        (a as any).name || '' :
-        (a as any).title || '';
-      const bField = b.type === 'team_members' ?
-        (b as any).name || '' :
-        (b as any).title || '';
+      const aField = isTeamMember(a) ? a.name : (a as SearchableItem).title || '';
+      const bField = isTeamMember(b) ? b.name : (b as SearchableItem).title || '';
       const aFieldNormalized = aField.toLowerCase().replace(/\s+/g, ' ').trim();
       const bFieldNormalized = bField.toLowerCase().replace(/\s+/g, ' ').trim();
       const aStartsWith = aFieldNormalized.startsWith(normalizedSearchTerm);
