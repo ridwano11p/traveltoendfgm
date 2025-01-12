@@ -1,3 +1,5 @@
+"use client"
+
 import { db } from "@/lib/firebase/config";
 import { collection, getDocs, query, where, DocumentData } from "firebase/firestore";
 import WhoWeAreClient from "./WhoWeAreClient";
