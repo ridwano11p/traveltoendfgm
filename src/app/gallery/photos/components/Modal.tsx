@@ -31,47 +31,45 @@ export default function Modal({ photo, isDark, onClose }: Props) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/75"
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-6 lg:p-8 bg-black/75"
       onClick={onClose}
     >
       <div
-        className={`relative w-full max-w-3xl mx-auto flex flex-col overflow-hidden rounded-xl ${
+        className={`relative w-full max-w-3xl mx-auto overflow-hidden rounded-xl ${
           isDark ? 'text-white' : 'text-gray-900'
         }`}
-        style={{ maxHeight: '90vh' }}
+        style={{ maxHeight: isMobile ? '95vh' : '90vh' }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close Button - Moved outside image container for better positioning */}
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-0 text-white hover:text-gray-200 z-20 p-3 rounded-tl-xl bg-black/60 hover:bg-black/80 transition-all duration-200 hover:rotate-90 transform"
+          aria-label="Close modal"
+        >
+          <FaTimes size={isMobile ? 22 : 26} />
+        </button>
+
         {/* Image Container */}
-        <div className="relative w-full" style={{ height: isMobile ? '50vh' : '60vh' }}>
+        <div className="w-full" style={{ height: isMobile ? '45vh' : '65vh' }}>
           <Image
             src={photo.photoUrl}
             alt={photo.title}
             fill
             className="object-contain"
-            sizes="(max-width: 768px) 100vw, 80vw"
+            sizes="(max-width: 768px) 100vw, 90vw"
             quality={95}
             priority
           />
-          
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-200 z-10 p-2 rounded-full bg-black/40 hover:bg-black/60 transition-all duration-200 hover:rotate-90 transform"
-            aria-label="Close modal"
-          >
-            <FaTimes size={isMobile ? 20 : 24} />
-          </button>
         </div>
 
         {/* Content Section */}
-        <div className={`space-y-4 p-6 backdrop-blur-md rounded-b-xl ${
+        <div className={`w-full space-y-4 p-6 backdrop-blur-md ${
           isDark
-            ? 'bg-gray-900/80 text-white'
-            : 'bg-white/90 text-gray-900'
+            ? 'bg-gray-900/90 text-white'
+            : 'bg-white/95 text-gray-900'
         }`}>
-          <h3 className={`text-xl md:text-2xl font-semibold ${
-            isDark ? 'text-white' : 'text-gray-900'
-          }`}>
+          <h3 className="text-xl md:text-2xl font-semibold">
             {photo.title}
           </h3>
           {photo.description && (
