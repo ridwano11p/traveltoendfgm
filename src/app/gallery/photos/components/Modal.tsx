@@ -28,46 +28,35 @@ export default function Modal({ photo, isDark, onClose }: Props) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-0 md:p-4 overflow-y-auto"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/75"
       onClick={onClose}
     >
       <div
-        className={`w-full h-full md:h-auto md:max-w-4xl mx-auto md:my-4 overflow-hidden ${
-          isDark ? 'bg-gray-800' : 'bg-white'
-        } md:rounded-lg shadow-2xl transform transition-all ${
-          isMobile ? 'flex flex-col' : ''
+        className={`relative w-full max-w-3xl mx-auto flex flex-col overflow-hidden rounded-xl ${
+          isDark ? 'text-white' : 'text-gray-900'
         }`}
+        style={{ maxHeight: '90vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Image Container */}
-        <div className={`relative ${
-          isMobile
-            ? 'w-full h-[80vh]' // Taller on mobile
-            : 'w-full h-[70vh]'
-        }`}>
+        <div className="relative w-full" style={{ height: isMobile ? '50vh' : '60vh' }}>
           <Image
             src={photo.photoUrl}
             alt={photo.title}
             fill
-            className={`${
-              isMobile
-                ? 'object-contain !important' // Force contain on mobile
-                : 'object-contain'
-            }`}
-            sizes="100vw"
+            className="object-contain"
+            sizes="(max-width: 768px) 100vw, 80vw"
+            quality={95}
             priority
           />
+          
           {/* Close Button */}
           <button
             onClick={onClose}
-            className={`absolute ${
-              isMobile
-                ? 'top-2 right-2'
-                : 'top-4 right-4'
-            } text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition-all duration-200 z-10 hover:rotate-90 transform`}
+            className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-200 z-10 p-2 rounded-full bg-black/40 hover:bg-black/60 transition-all duration-200 hover:rotate-90 transform"
             aria-label="Close modal"
           >
             <FaTimes size={isMobile ? 20 : 24} />
@@ -75,24 +64,22 @@ export default function Modal({ photo, isDark, onClose }: Props) {
         </div>
 
         {/* Content Section */}
-        <div className={`
-          ${isMobile ? 'flex-1 min-h-0' : ''}
-          ${isDark ? 'border-gray-700' : 'border-gray-200'}
-          p-4 md:p-6 border-t overflow-y-auto
-        `}>
-          <h3 className={`text-lg md:text-xl font-semibold mb-2 md:mb-3 ${
-            isDark ? 'text-white' : 'text-gray-800'
+        <div className={`space-y-4 p-6 backdrop-blur-md rounded-b-xl ${
+          isDark
+            ? 'bg-gray-900/80 text-white'
+            : 'bg-white/90 text-gray-900'
+        }`}>
+          <h3 className={`text-xl md:text-2xl font-semibold ${
+            isDark ? 'text-white' : 'text-gray-900'
           }`}>
             {photo.title}
           </h3>
           {photo.description && (
-            <div className={`prose max-w-none ${isDark ? 'prose-invert' : ''}`}>
-              <p className={`${
-                isDark ? 'text-gray-300' : 'text-gray-600'
-              } text-sm leading-relaxed`}>
-                {photo.description}
-              </p>
-            </div>
+            <p className={`text-base md:text-lg leading-relaxed ${
+              isDark ? 'text-gray-100' : 'text-gray-700'
+            }`}>
+              {photo.description}
+            </p>
           )}
         </div>
       </div>

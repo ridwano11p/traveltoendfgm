@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 export default function Error({
   error,
@@ -18,20 +19,29 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
-      <div className={`max-w-xl p-6 text-center ${isDark ? 'text-white' : 'text-gray-800'}`}>
-        <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-        <p className="mb-4">We apologize for the inconvenience. Please try again.</p>
-        <button
-          onClick={reset}
-          className={`px-4 py-2 rounded ${
-            isDark 
-              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
-          } transition duration-300`}
-        >
-          Try again
-        </button>
+    <div className={`min-h-screen flex items-center justify-center p-4 ${
+      isDark ? 'bg-gray-900' : 'bg-gray-100'
+    }`}>
+      <div className={`max-w-md w-full rounded-lg shadow-lg p-8 ${
+        isDark ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className="text-center">
+          <FaExclamationTriangle className="text-5xl mb-4 text-red-600 mx-auto" />
+          <h2 className="text-2xl font-bold mb-4 text-red-600">
+            Something went wrong!
+          </h2>
+          <p className={`mb-6 ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          }`}>
+            We apologize for the inconvenience. Please try again.
+          </p>
+          <button
+            onClick={reset}
+            className="w-full px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
+          >
+            Try again
+          </button>
+        </div>
       </div>
     </div>
   );

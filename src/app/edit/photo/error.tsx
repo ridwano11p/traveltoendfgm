@@ -15,18 +15,14 @@ export default function Error({
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${
-      isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'
+      isDark ? 'bg-gray-900' : 'bg-gray-100'
     }`}>
-      <div className={`max-w-md w-full p-6 rounded-lg shadow-xl ${
+      <div className={`max-w-md w-full rounded-lg shadow-lg p-8 ${
         isDark ? 'bg-gray-800' : 'bg-white'
       }`}>
-        <div className="text-center mb-6">
-          <FaExclamationTriangle className={`text-5xl mb-4 ${
-            isDark ? 'text-red-400' : 'text-red-600'
-          }`} />
-          <h2 className={`text-2xl font-bold mb-2 ${
-            isDark ? 'text-white' : 'text-gray-800'
-          }`}>
+        <div className="text-center">
+          <FaExclamationTriangle className="text-5xl mb-4 text-red-600 mx-auto" />
+          <h2 className="text-2xl font-bold mb-4 text-red-600">
             Error Loading Photo Editor
           </h2>
           <p className={`mb-6 ${
@@ -36,11 +32,7 @@ export default function Error({
           </p>
           <button
             onClick={reset}
-            className={`px-6 py-3 rounded-md transition-colors ${
-              isDark
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
+            className="w-full px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
           >
             Try again
           </button>
