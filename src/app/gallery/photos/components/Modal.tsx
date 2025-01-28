@@ -24,7 +24,7 @@ export default function Modal({ photo, onClose }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-50 bg-black/90 flex items-start justify-center overflow-y-auto"
       onClick={onClose}
     >
       {/* Desktop Layout */}
@@ -106,9 +106,9 @@ export default function Modal({ photo, onClose }: Props) {
         </div>
 
         {/* Revised Landscape layout */}
-        <div className="landscape:flex hidden relative w-full h-full items-center">
-          <div className="w-1/2 h-full flex items-center justify-center">
-            <div className="relative w-full" style={{ height: '90%' }}>
+        <div className="landscape:flex hidden relative w-full min-h-screen p-4">
+          <div className="w-1/2 sticky top-0 h-screen flex items-center justify-center">
+            <div className="relative w-full h-4/5">
               <Image
                 src={photo.photoUrl}
                 alt={photo.title}
@@ -121,16 +121,20 @@ export default function Modal({ photo, onClose }: Props) {
             </div>
           </div>
 
-          <div className="w-1/2 h-full flex flex-col justify-center px-4 overflow-y-auto">
-            <div className="max-h-[70vh] overflow-y-auto">
-              <h3 className="text-sm font-semibold mb-1 text-white">
-                {photo.title}
-              </h3>
-              {photo.description && (
-                <p className="text-xs leading-relaxed text-gray-100">
-                  {photo.description}
-                </p>
-              )}
+          <div className="w-1/2 py-4 px-6">
+            <div className="sticky top-4">
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-white">
+                  {photo.title}
+                </h3>
+                {photo.description && (
+                  <div className="max-h-[calc(100vh-8rem)] overflow-y-auto">
+                    <p className="text-xs leading-relaxed text-gray-100">
+                      {photo.description}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

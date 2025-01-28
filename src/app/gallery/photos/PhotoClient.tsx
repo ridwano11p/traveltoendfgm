@@ -44,7 +44,6 @@ export default function PhotoClient({ photos }: Props) {
           {selectedPhoto && (
             <Modal
               photo={selectedPhoto}
-              isDark={isDark}
               onClose={() => setSelectedPhoto(null)}
             />
           )}
