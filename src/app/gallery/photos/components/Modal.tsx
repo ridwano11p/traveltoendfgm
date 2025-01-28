@@ -7,11 +7,10 @@ import { Photo } from '../types';
 
 interface Props {
   photo: Photo;
-  isDark: boolean;
   onClose: () => void;
 }
 
-export default function Modal({ photo, isDark, onClose }: Props) {
+export default function Modal({ photo, onClose }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
