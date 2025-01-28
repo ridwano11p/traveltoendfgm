@@ -61,6 +61,7 @@ interface SubMenuProps {
   toggleMenu: () => void;
   closeMenu: () => void;
   isMobile: boolean;
+  theme: string;
 }
 
 const SubMenu = ({
@@ -70,6 +71,7 @@ const SubMenu = ({
   toggleMenu,
   closeMenu,
   isMobile,
+  theme,
 }: SubMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -92,15 +94,15 @@ const SubMenu = ({
 
   return (
     <div ref={menuRef} className={`${isMobile ? "w-full" : "relative group"}`}>
-      <button
+      <div
         onClick={toggleMenu}
-        className="flex items-center justify-between w-full text-white hover:text-gray-200 py-2"
+        className="flex items-center justify-between w-full text-white hover:text-gray-200 py-2 cursor-pointer"
       >
         <span className="flex-grow text-left">{title}</span>
-        <span className="ml-1">
+        <span className="ml-1 transition-transform duration-200">
           {isOpen ? <FaChevronUp /> : <FaChevronDown />}
         </span>
-      </button>
+      </div>
       <AnimatePresence mode="wait">
         {isOpen && (
           <motion.div
@@ -110,9 +112,9 @@ const SubMenu = ({
             transition={{ duration: 0.2 }}
             className={`${
               isMobile
-                ? "w-full bg-teal-800"
+                ? "w-full"
                 : "absolute left-0 mt-2 bg-white rounded-md shadow-xl"
-            } overflow-hidden z-20`}
+            } overflow-hidden z-20 ${theme === "dark" ? "bg-gray-800" : "bg-teal-700"}`}
           >
             {items.map((item, index) => (
               <Link
@@ -120,13 +122,10 @@ const SubMenu = ({
                 href={item.link}
                 className={`block px-4 py-2 text-sm ${
                   isMobile
-                    ? "text-white hover:bg-teal-600"
+                    ? `text-white hover:${theme === "dark" ? "bg-gray-700" : "bg-teal-600"}`
                     : "text-gray-700 hover:bg-gray-100"
-                } whitespace-nowrap`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeMenu();
-                }}
+                } whitespace-nowrap transition-colors duration-200`}
+                onClick={closeMenu}
               >
                 {item.name}
               </Link>
@@ -276,6 +275,7 @@ export default function NavBar() {
                 toggleMenu={() => toggleMenu("aboutUs")}
                 closeMenu={closeMenu}
                 isMobile={false}
+                theme={theme}
               />
             </div>
             <Link href="/impact-stories" className="text-white hover:text-gray-200">
@@ -289,6 +289,7 @@ export default function NavBar() {
                 toggleMenu={() => toggleMenu("docs")}
                 closeMenu={closeMenu}
                 isMobile={false}
+                theme={theme}
               />
             </div>
             <div className="submenu-container">
@@ -299,6 +300,7 @@ export default function NavBar() {
                 toggleMenu={() => toggleMenu("research")}
                 closeMenu={closeMenu}
                 isMobile={false}
+                theme={theme}
               />
             </div>
             <div className="submenu-container">
@@ -309,6 +311,7 @@ export default function NavBar() {
                 toggleMenu={() => toggleMenu("gallery")}
                 closeMenu={closeMenu}
                 isMobile={false}
+                theme={theme}
               />
             </div>
             <Link href="/contact" className="text-white hover:text-gray-200">
@@ -352,9 +355,16 @@ export default function NavBar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="w-full mobile-menu-container overflow-hidden"
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className={`w-full mobile-menu-container overflow-y-auto overscroll-none max-h-[calc(100vh-4rem)] ${
+                theme === "dark" ? "bg-gray-800" : "bg-teal-700"
+              }`}
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollBehavior: 'smooth'
+              }}
             >
-              <div className="flex flex-col space-y-2 p-4 bg-teal-800">
+              <div className="flex flex-col space-y-2 p-4 min-h-[calc(100vh-4rem)] touch-pan-y">
                 <Link
                   href="/"
                   className="text-white hover:text-gray-200 py-2"
@@ -376,6 +386,7 @@ export default function NavBar() {
                   toggleMenu={() => toggleMenu("aboutUs")}
                   closeMenu={closeMenu}
                   isMobile={true}
+                  theme={theme}
                 />
                 <Link
                   href="/impact-stories"
@@ -391,6 +402,7 @@ export default function NavBar() {
                   toggleMenu={() => toggleMenu("docs")}
                   closeMenu={closeMenu}
                   isMobile={true}
+                  theme={theme}
                 />
                 <SubMenu
                   title="Research and Reports"
@@ -399,6 +411,7 @@ export default function NavBar() {
                   toggleMenu={() => toggleMenu("research")}
                   closeMenu={closeMenu}
                   isMobile={true}
+                  theme={theme}
                 />
                 <SubMenu
                   title="Gallery"
@@ -407,6 +420,7 @@ export default function NavBar() {
                   toggleMenu={() => toggleMenu("gallery")}
                   closeMenu={closeMenu}
                   isMobile={true}
+                  theme={theme}
                 />
                 <Link
                   href="/contact"
