@@ -3,6 +3,7 @@
 import { FaTimes } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useEffect } from 'react';
 import { Photo } from '../types';
 
 interface Props {
@@ -11,6 +12,16 @@ interface Props {
 }
 
 export default function Modal({ photo, onClose }: Props) {
+  useEffect(() => {
+    // Disable scrolling on the background when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Re-enable scrolling when modal is closed
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   return (
    <motion.div
      initial={{ opacity: 0 }}
