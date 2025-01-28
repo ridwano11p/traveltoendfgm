@@ -50,7 +50,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
   const renderLatestImpactStories = () => {
     if (currentSlide === 3) {
       return (
-        <div className="flex flex-col items-center justify-center h-full min-h-[500px]">
+        <div className="flex flex-col items-center justify-center h-full min-h-[400px] landscape:min-h-[300px]">
           <h3 className={`text-2xl font-semibold mb-4 ${isDark ? "text-white" : "text-gray-800"}`}>
             Discover More Impact Stories
           </h3>
@@ -117,44 +117,46 @@ export default function HomeClient({ initialData }: HomeClientProps) {
   };
 
   return (
-    <div className={`min-h-screen w-full overflow-x-hidden ${isDark ? "bg-gray-900" : "bg-[#90d2dc]"}`}>
+    <div className={`min-h-screen w-full overflow-x-hidden ${isDark ? "bg-gray-900" : "bg-[#90d2dc]"} landscape:min-h-[500px]`}>
       <Banner />
-      <div className="w-full px-4 py-12 md:max-w-6xl md:mx-auto">
+      <div className="w-full px-4 py-8 landscape:py-4 md:py-12 md:max-w-6xl md:mx-auto">
         {/* Enhanced Search Bar */}
-        <div className="mb-16">
+        <div className="mb-12 md:mb-16">
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search our content..."
-              className={`flex-grow p-3 rounded-lg sm:rounded-r-none ${
-                isDark
-                  ? "bg-gray-800 text-white border-gray-700"
-                  : "bg-white text-gray-900 border-gray-200"
-              } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            />
-            <div className="flex">
-              <select
-                value={searchType}
-                onChange={(e) => setSearchType(e.target.value)}
-                className={`p-3 rounded-lg sm:rounded-none ${
-                  isDark
-                    ? "bg-gray-700 text-white border-gray-600"
-                    : "bg-gray-100 text-gray-900 border-gray-200"
-                } border-y border-l focus:outline-none`}
-              >
-                <option value="all">All Content</option>
-                <option value="blogs">Blog Posts</option>
-                <option value="featureStories">Feature Stories</option>
-                <option value="photos">Photos</option>
-                <option value="videos">Videos</option>
-                <option value="pdfs">Documents</option>
-                <option value="team_members">Team Members</option>
-              </select>
+            <div className="flex-grow flex gap-2">
+              <div className="flex-grow flex">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search our content..."
+                  className={`flex-grow p-3 rounded-l-lg ${
+                    isDark
+                      ? "bg-gray-800 text-white border-gray-700"
+                      : "bg-white text-gray-900 border-gray-200"
+                  } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                />
+                <select
+                  value={searchType}
+                  onChange={(e) => setSearchType(e.target.value)}
+                  className={`p-3 border-l-0 ${
+                    isDark
+                      ? "bg-gray-700 text-white border-gray-600"
+                      : "bg-gray-100 text-gray-900 border-gray-200"
+                  } border focus:outline-none min-w-[120px]`}
+                >
+                  <option value="all">All Content</option>
+                  <option value="blogs">Blog Posts</option>
+                  <option value="featureStories">Feature Stories</option>
+                  <option value="photos">Photos</option>
+                  <option value="videos">Videos</option>
+                  <option value="pdfs">Documents</option>
+                  <option value="team_members">Team Members</option>
+                </select>
+              </div>
               <button
                 type="submit"
-                className={`p-3 rounded-lg sm:rounded-l-none flex items-center justify-center min-w-[4rem] ${
+                className={`p-3 rounded-r-lg flex items-center justify-center w-12 sm:w-16 ${
                   isDark
                     ? "bg-blue-600 hover:bg-blue-700"
                     : "bg-blue-500 hover:bg-blue-600"
@@ -174,20 +176,20 @@ export default function HomeClient({ initialData }: HomeClientProps) {
             </h2>
             <div className={`rounded-lg shadow-md overflow-hidden ${isDark ? "bg-gray-800" : "bg-[#90d2dc]"}`}>
               <MediaContent
-                imageUrl={featureStory.imageUrl}
-                videoUrl={featureStory.videoUrl}
-                isYouTubeVideo={featureStory.isYouTubeVideo}
-                title={featureStory.title}
+                imageUrl={featureStory?.imageUrl ?? ''}
+                videoUrl={featureStory?.videoUrl ?? ''}
+                isYouTubeVideo={featureStory?.isYouTubeVideo ?? false}
+                title={featureStory?.title ?? ''}
               />
               <div className="p-6">
                 <h3 className={`text-2xl font-semibold mb-4 ${isDark ? "text-white" : "text-gray-800"}`}>
-                  {featureStory.title}
+                  {featureStory?.title}
                 </h3>
                 <div className={`mb-4 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                  {formatContent(featureStory.content.substring(0, 200) + "...")}
+                  {formatContent(featureStory?.content?.substring(0, 200) + "...")}
                 </div>
                 <div className="mb-4">
-                  {featureStory.tags && featureStory.tags.length > 0 ? (
+                  {featureStory?.tags && featureStory.tags.length > 0 ? (
                     featureStory.tags.map((tag: string) => (
                       <button
                         key={tag}
@@ -224,15 +226,15 @@ export default function HomeClient({ initialData }: HomeClientProps) {
             <h2 className={`text-3xl font-semibold mb-6 ${isDark ? "text-white" : "text-gray-800"}`}>
               Latest Impact Stories
             </h2>
-            <div className="relative flex items-center">
+            <div className="relative">
               <button
                 onClick={prevSlide}
-                className="absolute left-0 z-10 -ml-4 sm:-ml-12 bg-white rounded-full p-2 focus:outline-none shadow-md hover:bg-gray-100 transition-colors"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 -ml-3 md:-ml-6 bg-white/90 hover:bg-white rounded-full p-4 md:p-5 focus:outline-none shadow-lg transition-colors touch-manipulation active:scale-95"
                 aria-label="Previous story"
               >
                 <FaChevronLeft size={24} className="text-green-600" />
               </button>
-              <div className="w-full">
+              <div className="w-full px-12 md:px-16">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentSlide}
@@ -248,7 +250,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
               </div>
               <button
                 onClick={nextSlide}
-                className="absolute right-0 z-10 -mr-4 sm:-mr-12 bg-white rounded-full p-2 focus:outline-none shadow-md hover:bg-gray-100 transition-colors"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 -mr-3 md:-mr-6 bg-white/90 hover:bg-white rounded-full p-4 md:p-5 focus:outline-none shadow-lg transition-colors touch-manipulation active:scale-95"
                 aria-label="Next story"
               >
                 <FaChevronRight size={24} className="text-green-600" />

@@ -146,6 +146,17 @@ export default function NavBar() {
   const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (state.isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [state.isMobileMenuOpen]);
+
+  useEffect(() => {
     dispatch({ type: "CLOSE_ALL" });
   }, [pathname]);
 
@@ -322,8 +333,8 @@ export default function NavBar() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="lg:hidden">
-        <div className="flex items-center justify-between p-4">
+      <div className="lg:hidden" ref={navRef}>
+        <div className="flex items-center justify-between p-4" id="mobile-header">
           <Link href="/" className="flex items-center group">
             <div className="w-12 h-12 mr-2 relative">
               <Image
@@ -356,15 +367,17 @@ export default function NavBar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className={`w-full mobile-menu-container overflow-y-auto overscroll-none max-h-[calc(100vh-4rem)] ${
+              className={`fixed left-0 right-0 bottom-0 w-full mobile-menu-container overflow-y-auto overscroll-none ${
                 theme === "dark" ? "bg-gray-800" : "bg-teal-700"
               }`}
               style={{
                 WebkitOverflowScrolling: 'touch',
-                scrollBehavior: 'smooth'
+                scrollBehavior: 'smooth',
+                top: navRef.current ? `${navRef.current.getBoundingClientRect().height}px` : '64px',
+                height: navRef.current ? `calc(100vh - ${navRef.current.getBoundingClientRect().height}px)` : 'calc(100vh - 64px)'
               }}
             >
-              <div className="flex flex-col space-y-2 p-4 min-h-[calc(100vh-4rem)] touch-pan-y">
+              <div className="flex flex-col space-y-2 p-4 touch-pan-y">
                 <Link
                   href="/"
                   className="text-white hover:text-gray-200 py-2"
