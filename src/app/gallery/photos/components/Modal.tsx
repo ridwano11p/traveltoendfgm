@@ -69,20 +69,21 @@ export default function Modal({ photo, onClose }: Props) {
      </div>
 
      {/* Mobile Layout */}
-     <div className="md:hidden relative w-full h-full p-3 flex flex-col items-center justify-center"
+     <div className="md:hidden relative w-full h-full p-2 flex items-center justify-center"
        onClick={(e) => e.stopPropagation()}
      >
        <button
          onClick={onClose}
-         className="absolute top-2 right-2 z-20 p-2 text-white rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+         className="absolute top-2 right-2 z-20 p-1.5 text-white rounded-full bg-black/50 hover:bg-black/70 transition-colors"
          aria-label="Close modal"
        >
-         <FaTimes size={20} />
+         <FaTimes size={18} />
        </button>
 
-       <div className="relative w-full max-w-lg flex flex-col items-center justify-center h-full">
+       {/* Portrait layout */}
+       <div className="portrait:flex hidden relative w-full max-w-lg flex-col items-center justify-center h-full">
          <div className="relative w-full flex-1 flex items-center justify-center">
-           <div className="relative w-full h-full max-h-[60vh] portrait:aspect-[4/3]">
+           <div className="relative w-full aspect-[4/3]">
              <Image
                src={photo.photoUrl}
                alt={photo.title}
@@ -96,11 +97,39 @@ export default function Modal({ photo, onClose }: Props) {
          </div>
 
          <div className="w-full mt-2 px-3 py-2 text-center text-white">
-           <h3 className="text-lg landscape:text-base font-semibold mb-1">
+           <h3 className="text-lg font-semibold mb-1">
              {photo.title}
            </h3>
            {photo.description && (
-             <p className="text-sm landscape:text-xs leading-relaxed text-gray-100">
+             <p className="text-sm leading-relaxed text-gray-100">
+               {photo.description}
+             </p>
+           )}
+         </div>
+       </div>
+
+       {/* Landscape layout */}
+       <div className="landscape:grid hidden relative w-full h-full grid-cols-2 gap-2 items-center px-2">
+         <div className="relative h-full flex items-center justify-center">
+           <div className="relative w-full h-[85vh]">
+             <Image
+               src={photo.photoUrl}
+               alt={photo.title}
+               fill
+               className="object-contain"
+               sizes="50vw"
+               quality={95}
+               priority
+             />
+           </div>
+         </div>
+
+         <div className="w-full px-2 py-1 text-left text-white self-center">
+           <h3 className="text-sm font-semibold mb-0.5">
+             {photo.title}
+           </h3>
+           {photo.description && (
+             <p className="text-xs leading-relaxed text-gray-100 line-clamp-6">
                {photo.description}
              </p>
            )}
