@@ -13,10 +13,10 @@ export default function Loading() {
     }`}>
       <div className="text-center">
         <FaSpinner className={`animate-spin text-6xl mb-4 ${
-          isDark ? 'text-white' : 'text-gray-800'
+          isDark ? 'text-white' : 'text-black'
         }`} />
         <p className={`text-lg ${
-          isDark ? 'text-gray-300' : 'text-gray-700'
+          isDark ? 'text-white' : 'text-black'
         }`}>
           Loading article...
         </p>

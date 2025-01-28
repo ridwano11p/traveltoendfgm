@@ -12,7 +12,7 @@ export default function Loading() {
       isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'
     }`}>
       <FaSpinner className={`animate-spin text-6xl ${
-        isDark ? 'text-white' : 'text-gray-800'
+        isDark ? 'text-white' : 'text-black'
       }`} />
     </div>
   );

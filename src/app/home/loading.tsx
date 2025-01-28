@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import { FaSpinner } from "react-icons/fa";
 
 export default function HomeLoading(): React.JSX.Element {
   const { theme } = useTheme();
@@ -9,6 +10,11 @@ export default function HomeLoading(): React.JSX.Element {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+      {/* Centered Spinner */}
+      <div className="flex justify-center py-8">
+        <FaSpinner className="animate-spin text-6xl text-black dark:text-white" />
+      </div>
+      
       <div className="animate-pulse">
         {/* Feature Story Skeleton */}
         <div className={`w-full h-[500px] ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`} />

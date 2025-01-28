@@ -1,6 +1,18 @@
+"use client";
+
+import { useTheme } from '@/context/ThemeContext';
+import { FaSpinner } from 'react-icons/fa';
+
 export default function ImpactStoriesLoading() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen py-12 bg-[#90d2dc] dark:bg-gray-900">
+    <div className={`min-h-screen py-12 ${isDark ? 'bg-gray-900' : 'bg-[#90d2dc]'}`}>
+      {/* Centered Spinner */}
+      <div className="flex justify-center mb-8">
+        <FaSpinner className={`animate-spin text-6xl ${isDark ? 'text-white' : 'text-black'}`} />
+      </div>
       <div className="max-w-6xl mx-auto px-4">
         {/* Title Skeleton */}
         <div className="h-12 w-64 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-12 animate-pulse" />
