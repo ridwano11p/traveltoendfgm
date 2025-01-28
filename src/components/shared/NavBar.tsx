@@ -74,6 +74,7 @@ const SubMenu = ({
   theme,
 }: SubMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,7 +97,7 @@ const SubMenu = ({
     <div ref={menuRef} className={`${isMobile ? "w-full" : "relative group"}`}>
       <div
         onClick={toggleMenu}
-        className="flex items-center justify-between w-full text-white hover:text-gray-200 py-2 cursor-pointer"
+        className={`flex items-center justify-between w-full text-white ${!isMobile && (isDark ? "hover:text-green-300" : "hover:text-blue-200")} py-2 cursor-pointer transition-colors duration-200`}
       >
         <span className="flex-grow text-left">{title}</span>
         <span className="ml-1 transition-transform duration-200">
@@ -113,18 +114,20 @@ const SubMenu = ({
             className={`${
               isMobile
                 ? "w-full"
-                : "absolute left-0 mt-2 bg-white rounded-md shadow-xl"
-            } overflow-hidden z-20 ${theme === "dark" ? "bg-gray-800" : "bg-teal-700"}`}
+                : "absolute left-0 mt-2 rounded-md shadow-xl"
+            } overflow-hidden z-20 ${isDark ? "bg-gray-800" : "bg-teal-700"}`}
           >
             {items.map((item, index) => (
               <Link
                 key={index}
                 href={item.link}
-                className={`block px-4 py-2 text-sm ${
+                className={`block px-4 py-2 text-sm text-white ${
                   isMobile
-                    ? `text-white hover:${theme === "dark" ? "bg-gray-700" : "bg-teal-600"}`
-                    : "text-gray-700 hover:bg-gray-100"
-                } whitespace-nowrap transition-colors duration-200`}
+                    ? `hover:${isDark ? "bg-gray-700" : "bg-teal-600"}`
+                    : isDark 
+                      ? "hover:bg-gray-700/80" 
+                      : "hover:bg-teal-600/90"
+                } whitespace-nowrap transition-all duration-200`}
                 onClick={closeMenu}
               >
                 {item.name}
@@ -144,6 +147,7 @@ export default function NavBar() {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
   const navRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (state.isMobileMenuOpen) {
@@ -223,20 +227,20 @@ export default function NavBar() {
           {/* Top Row */}
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center space-x-4">
-              <Link href="/" className="text-white hover:text-gray-200">
+              <Link href="/" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
                 Home
               </Link>
-              <Link href="/search" className="text-white hover:text-gray-200">
+              <Link href="/search" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
                 Search
               </Link>
             </div>
             <div className="flex items-center space-x-4">
               {user && (
                 <>
-                  <Link href="/create" className="text-white hover:text-gray-200">
+                  <Link href="/create" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
                     Create
                   </Link>
-                  <Link href="/edit" className="text-white hover:text-gray-200">
+                  <Link href="/edit" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
                     Edit
                   </Link>
                 </>
@@ -244,12 +248,12 @@ export default function NavBar() {
               {user ? (
                 <button
                   onClick={handleLogout}
-                  className="text-white hover:text-gray-200"
+                  className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}
                 >
                   Logout
                 </button>
               ) : (
-                <Link href="/login" className="text-white hover:text-gray-200">
+                <Link href="/login" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
                   Login
                 </Link>
               )}
@@ -289,7 +293,7 @@ export default function NavBar() {
                 theme={theme}
               />
             </div>
-            <Link href="/impact-stories" className="text-white hover:text-gray-200">
+            <Link href="/impact-stories" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
               Stories
             </Link>
             <div className="submenu-container">
@@ -325,7 +329,7 @@ export default function NavBar() {
                 theme={theme}
               />
             </div>
-            <Link href="/contact" className="text-white hover:text-gray-200">
+            <Link href="/contact" className={`text-white ${isDark ? "hover:text-green-300" : "hover:text-blue-200"} transition-colors duration-200`}>
               Contact Us
             </Link>
           </div>

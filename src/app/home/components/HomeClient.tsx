@@ -121,48 +121,46 @@ export default function HomeClient({ initialData }: HomeClientProps) {
       <Banner />
       <div className="w-full px-4 py-8 landscape:py-4 md:py-12 md:max-w-6xl md:mx-auto">
         {/* Enhanced Search Bar */}
-        <div className="mb-12 md:mb-16">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-            <div className="flex-grow flex gap-2">
-              <div className="flex-grow flex">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search our content..."
-                  className={`flex-grow p-3 rounded-l-lg ${
-                    isDark
-                      ? "bg-gray-800 text-white border-gray-700"
-                      : "bg-white text-gray-900 border-gray-200"
-                  } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                />
-                <select
-                  value={searchType}
-                  onChange={(e) => setSearchType(e.target.value)}
-                  className={`p-3 border-l-0 ${
-                    isDark
-                      ? "bg-gray-700 text-white border-gray-600"
-                      : "bg-gray-100 text-gray-900 border-gray-200"
-                  } border focus:outline-none min-w-[120px]`}
-                >
-                  <option value="all">All Content</option>
-                  <option value="blogs">Blog Posts</option>
-                  <option value="featureStories">Feature Stories</option>
-                  <option value="photos">Photos</option>
-                  <option value="videos">Videos</option>
-                  <option value="pdfs">Documents</option>
-                  <option value="team_members">Team Members</option>
-                </select>
-              </div>
+        <div className="mb-12 md:mb-20">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 md:max-w-3xl md:mx-auto md:shadow-lg md:rounded-lg md:bg-opacity-50">
+            <div className="flex min-w-0 flex-1 md:p-1">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                className={`flex-1 min-w-[140px] p-2.5 md:p-4 text-sm md:text-base rounded-l-lg ${
+                  isDark
+                    ? "bg-gray-800 text-white border-gray-700 hover:bg-gray-750"
+                    : "bg-white text-gray-900 border-gray-200 hover:bg-gray-50"
+                } border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
+              />
+              <select
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+                className={`w-[90px] p-2.5 md:p-4 text-xs md:text-sm border-x-0 ${
+                  isDark
+                    ? "bg-gray-700 text-white border-gray-600"
+                    : "bg-gray-100 text-gray-900 border-gray-200"
+                } border focus:outline-none sm:w-[120px] sm:text-sm`}
+              >
+                <option value="all">All</option>
+                <option value="blogs">Blogs</option>
+                <option value="featureStories">Stories</option>
+                <option value="photos">Photos</option>
+                <option value="videos">Videos</option>
+                <option value="pdfs">PDFs</option>
+                <option value="team_members">Team</option>
+              </select>
               <button
                 type="submit"
-                className={`p-3 rounded-r-lg flex items-center justify-center w-12 sm:w-16 ${
+                className={`p-2.5 md:p-4 rounded-r-lg flex items-center justify-center w-11 md:w-16 ${
                   isDark
                     ? "bg-blue-600 hover:bg-blue-700"
                     : "bg-blue-500 hover:bg-blue-600"
-                } text-white transition-colors`}
+                } text-white transition-colors active:scale-95`}
               >
-                <FaSearch className="text-xl" />
+                <FaSearch className="text-base sm:text-lg md:text-xl" />
               </button>
             </div>
           </form>
