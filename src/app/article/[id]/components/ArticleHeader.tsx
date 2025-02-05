@@ -1,7 +1,8 @@
 "use client";
 
 import { ArticleHeaderProps } from '../types';
-import { FaCalendar, FaUser } from 'react-icons/fa';
+import { FaCalendar, FaUser, FaClock } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 export default function ArticleHeader({
   title,
@@ -11,38 +12,98 @@ export default function ArticleHeader({
   isDark
 }: ArticleHeaderProps) {
   return (
-    <div className="mb-6">
-      <h1 className="text-3xl md:text-4xl font-bold mb-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mb-8"
+    >
+      {/* Title */}
+      <h1 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight ${
+        isDark ? 'text-white' : 'text-gray-900'
+      }`}>
         {title}
       </h1>
-      <div className="flex flex-wrap items-center text-sm mb-6">
+
+      {/* Meta Information */}
+      <div className="flex flex-wrap items-center gap-4 mb-6">
         {author && (
-          <div className="flex items-center mr-6 mb-2">
-            <FaUser className="mr-2" />
-            <span>{author}</span>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className={`flex items-center px-3 py-1 rounded-full text-sm ${
+              isDark 
+                ? 'bg-gray-700/50 text-gray-300' 
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            <FaUser className="mr-2 text-xs" />
+            <span className="font-medium">{author}</span>
+          </motion.div>
         )}
+        
         {date && (
-          <div className="flex items-center mb-2">
-            <FaCalendar className="mr-2" />
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className={`flex items-center px-3 py-1 rounded-full text-sm ${
+              isDark 
+                ? 'bg-gray-700/50 text-gray-300' 
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            <FaCalendar className="mr-2 text-xs" />
             <span>{date}</span>
-          </div>
+          </motion.div>
         )}
+
+        {/* Reading Time Estimate (example) */}
+        <motion.div 
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className={`flex items-center px-3 py-1 rounded-full text-sm ${
+            isDark 
+              ? 'bg-gray-700/50 text-gray-300' 
+              : 'bg-gray-100 text-gray-700'
+          }`}
+        >
+          <FaClock className="mr-2 text-xs" />
+          <span>5 min read</span>
+        </motion.div>
       </div>
+
+      {/* Tags */}
       {tags && tags.length > 0 && (
-        <div className="mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="flex flex-wrap gap-2"
+        >
           {tags.map(tag => (
             <span
               key={tag}
-              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold mr-2 mb-2 ${
-                isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'
-              }`}
+              className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                isDark 
+                  ? 'bg-green-600/90 text-white hover:bg-green-500' 
+                  : 'bg-green-100 text-green-800 hover:bg-green-200'
+              } cursor-pointer hover:shadow-md`}
             >
-              {tag}
+              #{tag}
             </span>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+
+      {/* Divider */}
+      <div 
+        className={`mt-8 h-px ${
+          isDark ? 'bg-gray-700' : 'bg-gray-200'
+        }`}
+      />
+    </motion.div>
   );
 }

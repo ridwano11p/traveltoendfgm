@@ -14,62 +14,129 @@ export default function TeamMemberModal({ member, isDark, onClose }: TeamMemberM
   ].filter(item => item.link);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className={`relative max-w-2xl w-full rounded-lg shadow-lg ${
-        isDark ? 'bg-gray-800' : 'bg-[#90d2dc]'
-      } p-6 m-4 max-h-[90vh] overflow-y-auto`}>
-        <button
-          onClick={onClose}
-          className={`sticky top-0 float-right text-2xl ${
-            isDark ? 'text-gray-300' : 'text-gray-600'
-          } hover:text-gray-500 z-10`}
-        >
-          ×
-        </button>
-        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0">
-          <div className="md:w-1/3">
-            <div className="relative w-40 h-40 mx-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div 
+        className={`relative w-full max-w-2xl rounded-xl shadow-2xl ${
+          isDark ? 'bg-gray-800/95' : 'bg-[#90d2dc]/95'
+        } overflow-hidden`}
+      >
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          <div className="p-6">
+            <button
+              onClick={onClose}
+              className={`absolute top-4 right-4 text-2xl ${
+                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+              } transition-colors`}
+              aria-label="Close modal"
+            >
+              ×
+            </button>
+            <div className="flex gap-8">
+              <div className="w-1/3 flex-shrink-0">
+                <div className="relative w-48 h-48 mx-auto rounded-full overflow-hidden shadow-lg">
+                  <Image
+                    src={member.imageUrl}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 128px, 192px"
+                  />
+                </div>
+                {socialMediaLinks.length > 0 && (
+                  <div className="mt-6 flex justify-center gap-3">
+                    {socialMediaLinks.map((item, index) => (
+                      <SocialMediaButton
+                        key={index}
+                        icon={item.icon}
+                        link={item.link}
+                        isDark={isDark}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <h2 className={`text-3xl font-bold mb-2 ${
+                  isDark ? 'text-white' : 'text-gray-800'
+                }`}>
+                  {member.name}
+                </h2>
+                <p className={`text-xl mb-6 ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                  {member.role}
+                </p>
+                <div className={`prose max-w-none ${
+                  isDark ? 'text-gray-300 prose-invert' : 'text-gray-700'
+                }`}>
+                  {member.bio.split('\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="md:hidden h-[90vh] flex flex-col">
+          <div className="relative p-4 border-b border-gray-200/20">
+            <button
+              onClick={onClose}
+              className={`absolute top-4 right-4 text-2xl ${
+                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+              } transition-colors`}
+              aria-label="Close modal"
+            >
+              ×
+            </button>
+            <div className="relative w-24 h-24 mx-auto mb-4">
               <Image
                 src={member.imageUrl}
                 alt={member.name}
                 fill
                 className="rounded-full object-cover"
-                sizes="160px"
+                sizes="96px"
               />
             </div>
-          </div>
-          <div className="md:w-2/3 md:pl-6">
-            <h2 className={`text-2xl font-semibold mb-2 ${
+            <h2 className={`text-2xl font-bold text-center mb-1 ${
               isDark ? 'text-white' : 'text-gray-800'
             }`}>
               {member.name}
             </h2>
-            <p className={`text-lg mb-4 ${
+            <p className={`text-lg text-center ${
               isDark ? 'text-gray-300' : 'text-gray-600'
             }`}>
               {member.role}
             </p>
-            <div className={`mb-4 whitespace-pre-wrap ${
-              isDark ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              {member.bio}
-            </div>
           </div>
-        </div>
-        <div className="flex justify-end mt-4 space-x-2 sticky bottom-0 bg-inherit py-2">
-          {socialMediaLinks.length > 0 ? (
-            socialMediaLinks.map((item, index) => (
-              <SocialMediaButton
-                key={index}
-                icon={item.icon}
-                link={item.link}
-                isDark={isDark}
-              />
-            ))
-          ) : (
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              This team member has no social media links.
-            </p>
+
+          <div className={`flex-1 overflow-y-auto p-4 ${
+            isDark ? 'text-gray-300' : 'text-gray-700'
+          }`}>
+            {member.bio.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-4">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+
+          {socialMediaLinks.length > 0 && (
+            <div className={`p-4 border-t border-gray-200/20 ${
+              isDark ? 'bg-gray-800/95' : 'bg-[#90d2dc]/95'
+            } backdrop-blur-sm flex justify-center gap-3`}>
+              {socialMediaLinks.map((item, index) => (
+                <SocialMediaButton
+                  key={index}
+                  icon={item.icon}
+                  link={item.link}
+                  isDark={isDark}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
